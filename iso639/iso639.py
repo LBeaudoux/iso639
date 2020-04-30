@@ -3,6 +3,7 @@ import json
 
 from pkg_resources import resource_filename
 
+__all__ = ['Lang']
 
 TABLE_PATH =  resource_filename(__package__, 'iso-639-3.tab')
 MAPPING_PATH =  resource_filename(__package__, 'iso-639-3.json')
@@ -45,11 +46,11 @@ def _map_iso639_table(table):
     
     return mapping
 
-def _save_iso639_mapping(mapping_data):
+def _save_iso639_mapping(mapping):
     """Save the ISO-639 mapping into a JSON file.
     """
     with open(MAPPING_PATH, 'w') as f:
-        json.dump(mapping_data, f)    
+        json.dump(mapping, f)    
 
 
 
