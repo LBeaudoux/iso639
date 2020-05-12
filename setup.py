@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="iso639-l-bdx",
-    version="0.0.1",
+    version="0.0.2",
     author="L.Beaudoux",
     author_email="lbeaudoux@gmail.com",
     description="A Python 3.6 library for ISO 639 language codes.",
