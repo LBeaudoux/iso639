@@ -18,6 +18,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
-    package_data={'': ['*.tab', '*.json']},    
+    python_requires=">=3.6",
+    package_data={"": ["*.tab", "*.json"]},
 )
