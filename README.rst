@@ -1,21 +1,13 @@
-ISO639
+ISO 639
 ======
 
-A simple library for ISO 639 language codes.
-
-Supports
---------
-
-- ISO 639-1
-- ISO 639-3
+A simple library for ISO 639-1 and ISO 639-3 language codes.
 
 
 Installation
 ------------
 
 This library requires Python 3.6. 
-
-You can install it by getting it from pip:
 
 .. code:: sh
 
