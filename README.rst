@@ -1,5 +1,5 @@
 ISO 639
-======
+=======
 
 A simple library for ISO 639-1 and ISO 639-3 language codes.
 
