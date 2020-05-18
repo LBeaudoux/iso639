@@ -5,11 +5,11 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="iso639-lang",
-    version="0.0.3",
+    version="0.0.4",
     author="L.Beaudoux",
     description="A simple library for ISO 639 language codes.",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/l-bdx/iso639",
     packages=setuptools.find_packages(),
     classifiers=[

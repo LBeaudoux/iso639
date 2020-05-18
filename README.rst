@@ -57,8 +57,3 @@ Contains external data
 
 .. _ISO 639-3 Code Set: https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab
 
-
-License
--------
-
-MIT License
