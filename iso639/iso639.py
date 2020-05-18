@@ -39,7 +39,7 @@ class Lang:
         """
         if lang_pt3 not in Lang._data["pt3"]:
             raise InvalidLanguageValue(lang_pt3)
-        else:        
+        else:
             self._pt3 = lang_pt3
             self._pt1 = Lang._data["pt3"][lang_pt3]["pt1"]
             self._name = Lang._data["pt3"][lang_pt3]["name"]
@@ -56,7 +56,7 @@ class Lang:
         """
         if lang_pt1 not in Lang._data["pt1"]:
             raise InvalidLanguageValue(lang_pt1)
-        else:        
+        else:
             self._pt3 = Lang._data["pt1"][lang_pt1]["pt3"]
             self._pt1 = lang_pt1
             self._name = Lang._data["pt1"][lang_pt1]["name"]
@@ -77,4 +77,3 @@ class Lang:
             self._pt3 = Lang._data["name"][lang_name]["pt3"]
             self._pt1 = Lang._data["name"][lang_name]["pt1"]
             self._name = lang_name
-

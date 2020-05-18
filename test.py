@@ -18,7 +18,7 @@ class TestLang(unittest.TestCase):
         self.assertRaises(InvalidLanguageValue, Lang, "FR")
 
     def test_capitalized_pt1(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "Fr")        
+        self.assertRaises(InvalidLanguageValue, Lang, "Fr")
 
     def test_pt3_with_pt1(self):
         lg = Lang("eng")
@@ -36,7 +36,7 @@ class TestLang(unittest.TestCase):
         self.assertRaises(InvalidLanguageValue, Lang, "ENG")
 
     def test_capitalized_pt3(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "Eng")           
+        self.assertRaises(InvalidLanguageValue, Lang, "Eng")
 
     def test_name(self):
         lg = Lang("German")
@@ -48,7 +48,7 @@ class TestLang(unittest.TestCase):
         self.assertRaises(InvalidLanguageValue, Lang, "german")
 
     def test_upper_name(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "GERMAN")        
+        self.assertRaises(InvalidLanguageValue, Lang, "GERMAN")
 
 
 if __name__ == "__main__":
