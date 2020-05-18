@@ -1,18 +1,26 @@
 ISO639
 ======
 
-An easy-to-use Python 3.6 library for ISO 639 language codes.
-
-License
--------
-
-MIT License
+A simple library for ISO 639 language codes.
 
 Supports
 --------
 
 - ISO 639-1
 - ISO 639-3
+
+
+Installation
+------------
+
+This library requires Python 3.6. 
+
+You can install it by getting it from pip:
+
+.. code:: sh
+
+    pip3 install iso639-lang
+
 
 Usage
 -----
@@ -48,3 +56,9 @@ Contains external data
 - `ISO 639-3 Code Set`_, dated 2020-01-20
 
 .. _ISO 639-3 Code Set: https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab
+
+
+License
+-------
+
+MIT License
