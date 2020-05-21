@@ -15,10 +15,12 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.name, "French")
 
     def test_upper_pt1(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "FR")
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("FR")
 
     def test_capitalized_pt1(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "Fr")
+        with self.assertRaises(InvalidLanguageValue):        
+            Lang("Fr")
 
     def test_pt3_with_pt1(self):
         lg = Lang("eng")
@@ -33,7 +35,8 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.name, "Mandarin Chinese")
 
     def test_upper_pt3(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "ENG")
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("ENG")
 
     def test_capitalized_pt3(self):
         self.assertRaises(InvalidLanguageValue, Lang, "Eng")
@@ -45,10 +48,12 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.name, "German")
 
     def test_lower_name(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "german")
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("german")
 
     def test_upper_name(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "GERMAN")
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("GERMAN")
 
 
 if __name__ == "__main__":
