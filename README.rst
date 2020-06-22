@@ -41,6 +41,11 @@ Usage
     >>> language.pt3
     'deu'    
 
+    >>> other_language = Lang("de")
+    >>> language == other_language
+    True
+
+
 
 Contains external data
 ----------------------
