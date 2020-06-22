@@ -25,7 +25,16 @@ class Lang:
             self.name = language
 
     def __repr__(self):
+
         return f"pt3 : {self.pt3}, pt1 : {self.pt1}, name : {self.name}"
+
+    def __eq__(self, other):
+
+        return (
+            self._pt1 == other.pt1
+            and self._pt3 == other.pt3
+            and self.name == other.name
+        )
 
     @property
     def pt3(self):

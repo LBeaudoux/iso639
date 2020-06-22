@@ -19,7 +19,7 @@ class TestLang(unittest.TestCase):
             Lang("FR")
 
     def test_capitalized_pt1(self):
-        with self.assertRaises(InvalidLanguageValue):        
+        with self.assertRaises(InvalidLanguageValue):
             Lang("Fr")
 
     def test_pt3_with_pt1(self):
@@ -54,6 +54,16 @@ class TestLang(unittest.TestCase):
     def test_upper_name(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang("GERMAN")
+
+    def test_equal_languages(self):
+        lg1 = Lang("eng")
+        lg2 = Lang("eng")
+        self.assertEqual(lg1, lg2)
+
+    def test_not_equal_languages(self):
+        lg1 = Lang("fra")
+        lg2 = Lang("eng")
+        self.assertNotEqual(lg1, lg2)
 
 
 if __name__ == "__main__":

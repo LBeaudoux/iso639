@@ -4,3 +4,4 @@ env_iso639/
 build/
 dist/
 iso639_lang.egg-info/
+.vscode
