@@ -65,6 +65,16 @@ class TestLang(unittest.TestCase):
         lg2 = Lang("eng")
         self.assertNotEqual(lg1, lg2)
 
+    def test_not_equal_languages_string(self):
+        lg1 = Lang("fra")
+        lg2 = "fra"
+        self.assertNotEqual(lg1, lg2)        
+
+    def test_not_equal_languages_None(self):
+        lg1 = Lang("fra")
+        lg2 = None
+        self.assertNotEqual(lg1, lg2)             
+
 
 if __name__ == "__main__":
     unittest.main()

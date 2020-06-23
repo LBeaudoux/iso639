@@ -31,7 +31,8 @@ class Lang:
     def __eq__(self, other):
 
         return (
-            self._pt1 == other.pt1
+            isinstance(other, Lang)
+            and self._pt1 == other.pt1
             and self._pt3 == other.pt3
             and self.name == other.name
         )
