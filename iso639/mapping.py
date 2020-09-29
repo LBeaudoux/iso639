@@ -11,7 +11,7 @@ def load_iso639_mapping():
     """Load the ISO-639 mapping from its JSON file.
     """
     try:
-        with open(MAPPING_PATH) as f:
+        with open(MAPPING_PATH, encoding='utf-8') as f:
             mapping = json.load(f)
     except FileNotFoundError:
         table = _load_iso639_table()
@@ -24,7 +24,7 @@ def load_iso639_mapping():
 def _load_iso639_table():
     """Load the iso639 table from its tab file.
     """
-    with open(TABLE_PATH) as f:
+    with open(TABLE_PATH, encoding='utf-8') as f:
         reader = csv.reader(f, delimiter="\t")
         next(reader)
 
@@ -52,5 +52,5 @@ def _map_iso639_table(table):
 def _save_iso639_mapping(mapping):
     """Save the ISO-639 mapping into a JSON file.
     """
-    with open(MAPPING_PATH, "w") as f:
+    with open(MAPPING_PATH, "w", encoding='utf-8') as f:
         json.dump(mapping, f)

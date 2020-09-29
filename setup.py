@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="iso639-lang",
-    version="0.0.7",
+    version="0.0.8",
     author="L.Beaudoux",
     description="A simple library for ISO 639 language codes.",
     long_description=long_description,
