@@ -5,12 +5,13 @@ from iso639.exceptions import InvalidLanguageValue
 
 
 class TestLang(unittest.TestCase):
-    """Test the Lang class.
-    """
+    """Test the Lang class."""
 
     def test_pt1(self):
         lg = Lang("fr")
         self.assertEqual(lg.pt1, "fr")
+        self.assertEqual(lg.pt2b, "fre")
+        self.assertEqual(lg.pt2t, "fra")
         self.assertEqual(lg.pt3, "fra")
         self.assertEqual(lg.name, "French")
 
@@ -22,15 +23,35 @@ class TestLang(unittest.TestCase):
         with self.assertRaises(InvalidLanguageValue):
             Lang("Fr")
 
-    def test_pt3_with_pt1(self):
+    def test_pt2b(self):
+        lg = Lang("fre")
+        self.assertEqual(lg.pt1, "fr")
+        self.assertEqual(lg.pt2b, "fre")
+        self.assertEqual(lg.pt2t, "fra")
+        self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.name, "French")
+
+    def test_pt2t(self):
+        lg = Lang("deu")
+        self.assertEqual(lg.pt1, "de")
+        self.assertEqual(lg.pt2b, "ger")
+        self.assertEqual(lg.pt2t, "deu")
+        self.assertEqual(lg.pt3, "deu")
+        self.assertEqual(lg.name, "German")
+
+    def test_pt3_with_other_pts(self):
         lg = Lang("eng")
         self.assertEqual(lg.pt1, "en")
+        self.assertEqual(lg.pt2b, "eng")
+        self.assertEqual(lg.pt2t, "eng")
         self.assertEqual(lg.pt3, "eng")
         self.assertEqual(lg.name, "English")
 
-    def test_pt3_without_pt1(self):
+    def test_pt3_without_other_pts(self):
         lg = Lang("cmn")
         self.assertEqual(lg.pt1, "")
+        self.assertEqual(lg.pt2b, "")
+        self.assertEqual(lg.pt2t, "")
         self.assertEqual(lg.pt3, "cmn")
         self.assertEqual(lg.name, "Mandarin Chinese")
 
@@ -39,11 +60,14 @@ class TestLang(unittest.TestCase):
             Lang("ENG")
 
     def test_capitalized_pt3(self):
-        self.assertRaises(InvalidLanguageValue, Lang, "Eng")
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("Eng")
 
     def test_name(self):
         lg = Lang("German")
         self.assertEqual(lg.pt1, "de")
+        self.assertEqual(lg.pt2b, "ger")
+        self.assertEqual(lg.pt2t, "deu")
         self.assertEqual(lg.pt3, "deu")
         self.assertEqual(lg.name, "German")
 
@@ -68,12 +92,17 @@ class TestLang(unittest.TestCase):
     def test_not_equal_languages_string(self):
         lg1 = Lang("fra")
         lg2 = "fra"
-        self.assertNotEqual(lg1, lg2)        
+        self.assertNotEqual(lg1, lg2)
 
     def test_not_equal_languages_None(self):
         lg1 = Lang("fra")
         lg2 = None
-        self.assertNotEqual(lg1, lg2)             
+        self.assertNotEqual(lg1, lg2)
+
+    def test_lang_of_lang(self):
+        lg1 = Lang("fra")
+        lg2 = Lang(lg1)
+        self.assertEqual(lg1, lg2)
 
 
 if __name__ == "__main__":

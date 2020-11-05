@@ -1,8 +1,10 @@
 class InvalidLanguageValue(Exception):
-    """Customed exception raised when the argument passed to the Lang 
+    """Customed exception raised when the argument passed to the Lang
     constructor is not a valid:
     - ISO 639 language name
     - ISO 639-3 language code
+    - ISO 639-2B language code
+    - ISO 639-2T language code
     - ISO 639-1 language code
     """
 
