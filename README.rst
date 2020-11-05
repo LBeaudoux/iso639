@@ -1,7 +1,7 @@
 ISO 639
 =======
 
-A simple library for ISO 639-1 and ISO 639-3 language codes.
+A lightweight library for ISO 639-1, ISO 639-2 and ISO 639-3 language representation standards.
 
 
 Installation
@@ -24,24 +24,32 @@ Usage
     >>> language = Lang("fr")
     >>> language.pt1
     'fr'
+    >>> language.pt2b
+    'fre'
+    >>> language.pt2t
+    'fra'
     >>> language.pt3
     'fra'    
     >>> language.name
     'French'   
 
-    >>> language.pt3 = 'eng'
-    >>> language.pt1
-    'en'    
-    >>> language.name
-    'English' 
-
     >>> language.name = 'German'
     >>> language.pt1
     'de'
+    >>> language.pt2b
+    'ger'
+    >>> language.pt2t
+    'deu'
     >>> language.pt3
     'deu'    
+    >>> language.name
+    'German'   
 
-    >>> other_language = Lang("de")
+    >>> other_language = Lang("ger")
+    >>> language == other_language
+    True
+
+    >>> other_language = Lang(language)
     >>> language == other_language
     True
 
