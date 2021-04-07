@@ -20,7 +20,7 @@ def load_iso639_mapping():
         # remap if the mapping is incomplete
         if any(
             k not in mapping.keys()
-            for k in ("pt1", "pt2B", "pt2T", "pt3", "name")
+            for k in ("pt1", "pt2b", "pt2t", "pt3", "name")
         ):
             mapping = _build_iso639_mapping()
             with open(MAPPING_PATH, "w", encoding="utf-8") as f:
@@ -31,7 +31,7 @@ def load_iso639_mapping():
 
 def _build_iso639_mapping():
     """Builds the ISO-639 mapping from its tab file"""
-    mapping = {k: {} for k in ("pt1", "pt2B", "pt2T", "pt3", "name")}
+    mapping = {k: {} for k in ("pt1", "pt2b", "pt2t", "pt3", "name")}
     with open(TABLE_PATH, encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t")
         next(reader)
@@ -39,24 +39,24 @@ def _build_iso639_mapping():
             # ISO 639-1 codes (2 characters)
             if row[3]:
                 mapping["pt1"][row[3]] = {
-                    "pt2B": row[1],
-                    "pt2T": row[2],
+                    "pt2b": row[1],
+                    "pt2t": row[2],
                     "pt3": row[0],
                     "name": row[6],
                 }
             # ISO 639-2B codes (3 characters)
             if row[1]:
-                mapping["pt2B"][row[1]] = {
+                mapping["pt2b"][row[1]] = {
                     "pt1": row[3],
-                    "pt2T": row[2],
+                    "pt2t": row[2],
                     "pt3": row[0],
                     "name": row[6],
                 }
             # ISO 639-2T codes (3 characters)
             if row[2]:
-                mapping["pt2T"][row[2]] = {
+                mapping["pt2t"][row[2]] = {
                     "pt1": row[3],
-                    "pt2B": row[1],
+                    "pt2b": row[1],
                     "pt3": row[0],
                     "name": row[6],
                 }
@@ -64,16 +64,16 @@ def _build_iso639_mapping():
             if row[0]:
                 mapping["pt3"][row[0]] = {
                     "pt1": row[3],
-                    "pt2B": row[1],
-                    "pt2T": row[2],
+                    "pt2b": row[1],
+                    "pt2t": row[2],
                     "name": row[6],
                 }
             # ISO 639 names (capitalized string)
             if row[6]:
                 mapping["name"][row[6]] = {
                     "pt1": row[3],
-                    "pt2B": row[1],
-                    "pt2T": row[2],
+                    "pt2b": row[1],
+                    "pt2t": row[2],
                     "pt3": row[0],
                 }
 

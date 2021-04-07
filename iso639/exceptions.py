@@ -10,6 +10,6 @@ class InvalidLanguageValue(Exception):
 
     def __init__(self, language):
 
-        msg = f"{language} is not a valid ISO-639 value"
+        msg = f"'{language}' is not a valid ISO-639 value"
 
         super().__init__(msg)
