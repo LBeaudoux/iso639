@@ -1,6 +1,6 @@
 class InvalidLanguageValue(Exception):
-    """Customed exception raised when the argument passed to the Lang
-    constructor is not a valid:
+    """Customed exception raised when the arguments and keyword
+    arguments passed to the Lang constructor are not a valid combination of:
     - ISO 639 language name
     - ISO 639-3 language code
     - ISO 639-2B language code
@@ -8,8 +8,9 @@ class InvalidLanguageValue(Exception):
     - ISO 639-1 language code
     """
 
-    def __init__(self, language):
+    def __init__(self, *args, **kwargs):
 
-        msg = f"'{language}' is not a valid ISO-639 value"
+        arg_str = ", ".join(list(args) + ["=".join(x) for x in kwargs.items()])
+        msg = f"'{arg_str}' not supported by ISO-639"
 
         super().__init__(msg)

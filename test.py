@@ -104,6 +104,63 @@ class TestLang(unittest.TestCase):
         lg2 = Lang(lg1)
         self.assertEqual(lg1, lg2)
 
+    def test_multiple_arg(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("fra", "fr")
+
+    def test_kwarg(self):
+        lg = Lang(pt1="fr")
+        self.assertEqual(lg.pt1, "fr")
+        self.assertEqual(lg.pt2b, "fre")
+        self.assertEqual(lg.pt2t, "fra")
+        self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.name, "French")
+
+    def test_multiple_kwarg(self):
+        lg = Lang(pt1="fr", name="French")
+        self.assertEqual(lg.pt1, "fr")
+        self.assertEqual(lg.pt2b, "fre")
+        self.assertEqual(lg.pt2t, "fra")
+        self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.name, "French")
+
+    def test_kwarg_wrong_value(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang(pt1="fra")
+
+    def test_kwarg_wrong_second_value(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang(pt1="fr", pt3="deu")
+
+    def test_kwarg_wrong_key(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang(foobar="fr")
+
+    def test_kwarg_wrong_second_key(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang(pt1="fr", foobar="fra")
+
+    def test_no_param(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang()
+
+    def test_arg_and_kwarg(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("fra", pt1="fr")
+
+    def test_attribute_setter(self):
+        lg = Lang("spa")
+        for k, v in [
+            ("pt1", "de"),
+            ("pt2b", "fre"),
+            ("pt2t", "deu"),
+            ("pt3", "cmn"),
+            ("name", "Italian"),
+        ]:
+            lg[k] = v
+            self.assertEqual(getattr(lg, k), v)
+            self.assertEqual(lg, Lang(v))
+
 
 if __name__ == "__main__":
     unittest.main()
