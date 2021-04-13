@@ -1,8 +1,8 @@
 from .exceptions import InvalidLanguageValue
-from .mapping import load_iso639_mapping
+from .mapping import ISO639Mapping
 
 
-TAGS = ("name", "pt1", "pt2b", "pt2t", "pt3")
+TAGS = ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5")
 
 
 class Lang:
@@ -16,6 +16,9 @@ class Lang:
 
     Attributes
     ----------
+    name : str
+        ISO 639-3 reference language name if there is one, ISO 639-2 or
+        ISO 639-5 English name otherwise
     pt1 : str
         two-letter ISO 639-1 code, if there is one
     pt2b : str
@@ -25,12 +28,12 @@ class Lang:
         three-letter ISO 639-2 code for terminology applications,
         if there is one
     pt3 : str
-        three-letter ISO 639-3 code
-    name : str
-        ISO 639-3 reference language name
+        three-letter ISO 639-3 code, if there is one
+    pt5 : str
+        three-letter ISO 639-5 code, if there is one
     """
 
-    _data = load_iso639_mapping()
+    _data = ISO639Mapping().load()
 
     def __init__(self, *args, **kwargs):
 
@@ -40,11 +43,10 @@ class Lang:
             if isinstance(lang, Lang):
                 params = {k[1:]: v for k, v in lang.__dict__.items()}
             elif len(lang) == 3 and lang.lower() == lang:
-                params = self._get_params("pt3", lang)
-                if not params:
-                    # note that when it exists, the ISO 639-2T of a language
-                    # is always equal to its ISO 639-3
-                    params = self._get_params("pt2b", lang)
+                for tag in ("pt3", "pt2b", "pt2t", "pt5"):
+                    params = self._get_params(tag, lang)
+                    if params:
+                        break
             elif len(lang) == 2 and lang.lower() == lang:
                 params = self._get_params("pt1", lang)
             else:
@@ -118,6 +120,17 @@ class Lang:
         """Sets this language to this ISO 639-3 code"""
         params = self._get_params("pt3", lang_pt3)
         self._set_attributes(params, lang_pt3)
+
+    @property
+    def pt5(self):
+        """Gets the ISO 639-5 code of this language"""
+        return self._pt5
+
+    @pt5.setter
+    def pt5(self, lang_pt5):
+        """Sets this language to this ISO 639-5 code"""
+        params = self._get_params("pt5", lang_pt5)
+        self._set_attributes(params, lang_pt5)
 
     @property
     def name(self):

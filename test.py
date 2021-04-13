@@ -13,6 +13,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "fre")
         self.assertEqual(lg.pt2t, "fra")
         self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "French")
 
     def test_upper_pt1(self):
@@ -29,6 +30,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "fre")
         self.assertEqual(lg.pt2t, "fra")
         self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "French")
 
     def test_pt2t(self):
@@ -37,7 +39,17 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "ger")
         self.assertEqual(lg.pt2t, "deu")
         self.assertEqual(lg.pt3, "deu")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "German")
+
+    def test_pt5(self):
+        lg = Lang("ber")
+        self.assertEqual(lg.pt1, "")
+        self.assertEqual(lg.pt2b, "ber")
+        self.assertEqual(lg.pt2t, "")
+        self.assertEqual(lg.pt3, "")
+        self.assertEqual(lg.pt5, "ber")
+        self.assertEqual(lg.name, "Berber languages")
 
     def test_pt3_with_other_pts(self):
         lg = Lang("eng")
@@ -45,6 +57,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "eng")
         self.assertEqual(lg.pt2t, "eng")
         self.assertEqual(lg.pt3, "eng")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "English")
 
     def test_pt3_without_other_pts(self):
@@ -53,6 +66,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "")
         self.assertEqual(lg.pt2t, "")
         self.assertEqual(lg.pt3, "cmn")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "Mandarin Chinese")
 
     def test_upper_pt3(self):
@@ -69,6 +83,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "ger")
         self.assertEqual(lg.pt2t, "deu")
         self.assertEqual(lg.pt3, "deu")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "German")
 
     def test_lower_name(self):
@@ -114,6 +129,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "fre")
         self.assertEqual(lg.pt2t, "fra")
         self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "French")
 
     def test_multiple_kwarg(self):
@@ -122,6 +138,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt2b, "fre")
         self.assertEqual(lg.pt2t, "fra")
         self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "French")
 
     def test_kwarg_wrong_value(self):
