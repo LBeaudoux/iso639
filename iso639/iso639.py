@@ -1,83 +1,81 @@
 from .exceptions import InvalidLanguageValue
-from .mapping import load_iso639_mapping
+from .mapping import ISO639Mapping
+
+
+TAGS = ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5")
 
 
 class Lang:
-    """Handler for the ISO 639 language representation standard
-    The ISO 639 mapping data comes from the official site of the
-    ISO 639-3 Registration Authority:
-    https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab
+    """Lang handles the ISO 639 series of international standards
+    for language codes
+
+    Instantiable with any ISO 639 language code or name as argument
+    (case sensitive)
+
+    ...
+
+    Attributes
+    ----------
+    name : str
+        ISO 639-3 reference language name if there is one, ISO 639-2 or
+        ISO 639-5 English name otherwise
+    pt1 : str
+        two-letter ISO 639-1 code, if there is one
+    pt2b : str
+        three-letter ISO 639-2 code for bibliographic applications,
+        if there is one
+    pt2t : str
+        three-letter ISO 639-2 code for terminology applications,
+        if there is one
+    pt3 : str
+        three-letter ISO 639-3 code, if there is one
+    pt5 : str
+        three-letter ISO 639-5 code, if there is one
     """
 
-    _data = load_iso639_mapping()
+    _data = ISO639Mapping().load()
 
-    def __init__(self, language):
-        """
-        Parameters
-        ----------
-        language : str
-            A language code (ISO 639-1, ISO 639-2B, ISO 639-2T, ISO 639-3)
-            or an ISO 639 language name. Case sensitive
-        """
+    def __init__(self, *args, **kwargs):
 
-        self._pt1 = ""
-        self._pt2b = ""
-        self._pt2t = ""
-        self._pt3 = ""
-        self._name = ""
+        params = {}
+        if not kwargs and len(args) == 1:
+            lang = args[0]
+            if isinstance(lang, Lang):
+                params = {k[1:]: v for k, v in lang.__dict__.items()}
+            elif len(lang) == 3 and lang.lower() == lang:
+                for tag in ("pt3", "pt2b", "pt2t", "pt5"):
+                    params = self._get_params(tag, lang)
+                    if params:
+                        break
+            elif len(lang) == 2 and lang.lower() == lang:
+                params = self._get_params("pt1", lang)
+            else:
+                params = self._get_params("name", lang)
+        elif not args and kwargs:
+            a = [self._get_params(tg, lg) for tg, lg in kwargs.items()]
+            params = {} if a.count(a[0]) != len(a) else a[0]
 
-        if isinstance(language, Lang):
-            self._pt1 = language._pt1
-            self._pt2b = language._pt2b
-            self._pt2t = language._pt2t
-            self._pt3 = language._pt3
-            self._name = language._name
-        elif len(language) == 3 and language.lower() == language:
-            try:
-                self.pt3 = language
-                # note that when it exists, the ISO 639-2T of a language
-                # is always equal to its ISO 639-3
-            except InvalidLanguageValue:
-                self.pt2b = language
-        elif len(language) == 2 and language.lower() == language:
-            self.pt1 = language
-        else:
-            self.name = language
+        self._set_attributes(params, *args, **kwargs)
 
     def __repr__(self):
 
-        return (
-            f"pt3 : {self.pt3}, pt1 : {self.pt1}, pt2b : {self.pt2b}, "
-            f"pt2t : {self.pt2t}, name : {self.name}"
-        )
+        msg = ", ".join((f"{tag}='{getattr(self, tag)}'" for tag in TAGS))
+
+        return f"Lang({msg})"
 
     def __eq__(self, other):
 
-        return (
-            isinstance(other, Lang)
-            and self.pt1 == other.pt1
-            and self.pt2b == other.pt2b
-            and self.pt2t == other.pt2t
-            and self.pt3 == other.pt3
-            and self.name == other.name
+        return isinstance(other, Lang) and all(
+            self[t] == other[t] for t in TAGS
         )
 
-    @property
-    def pt3(self):
-        """Gets the ISO 639-3 code of this language"""
-        return self._pt3
+    def __getitem__(self, lang_tag):
 
-    @pt3.setter
-    def pt3(self, lang_pt3):
-        """Sets this language to this ISO 639-3 code"""
-        if lang_pt3 not in Lang._data["pt3"]:
-            raise InvalidLanguageValue(lang_pt3)
-        else:
-            self._pt3 = lang_pt3
-            self._pt1 = Lang._data["pt3"][lang_pt3]["pt1"]
-            self._pt2b = Lang._data["pt3"][lang_pt3]["pt2B"]
-            self._pt2t = Lang._data["pt3"][lang_pt3]["pt2T"]
-            self._name = Lang._data["pt3"][lang_pt3]["name"]
+        return getattr(self, lang_tag)
+
+    def __setitem__(self, lang_tag, new_lang_value):
+
+        setattr(self, lang_tag, new_lang_value)
 
     @property
     def pt1(self):
@@ -87,14 +85,8 @@ class Lang:
     @pt1.setter
     def pt1(self, lang_pt1):
         """Sets this language to this ISO 639-1 code"""
-        if lang_pt1 not in Lang._data["pt1"]:
-            raise InvalidLanguageValue(lang_pt1)
-        else:
-            self._pt3 = Lang._data["pt1"][lang_pt1]["pt3"]
-            self._pt1 = lang_pt1
-            self._pt2b = Lang._data["pt1"][lang_pt1]["pt2B"]
-            self._pt2t = Lang._data["pt1"][lang_pt1]["pt2T"]
-            self._name = Lang._data["pt1"][lang_pt1]["name"]
+        params = self._get_params("pt1", lang_pt1)
+        self._set_attributes(params, lang_pt1)
 
     @property
     def pt2b(self):
@@ -104,14 +96,8 @@ class Lang:
     @pt2b.setter
     def pt2b(self, lang_pt2b):
         """Sets this language to this ISO 639-2B code"""
-        if lang_pt2b not in Lang._data["pt2B"]:
-            raise InvalidLanguageValue(lang_pt2b)
-        else:
-            self._pt3 = Lang._data["pt2B"][lang_pt2b]["pt3"]
-            self._pt1 = Lang._data["pt2B"][lang_pt2b]["pt1"]
-            self._pt2b = lang_pt2b
-            self._pt2t = Lang._data["pt2B"][lang_pt2b]["pt2T"]
-            self._name = Lang._data["pt2B"][lang_pt2b]["name"]
+        params = self._get_params("pt2b", lang_pt2b)
+        self._set_attributes(params, lang_pt2b)
 
     @property
     def pt2t(self):
@@ -121,14 +107,30 @@ class Lang:
     @pt2t.setter
     def pt2t(self, lang_pt2t):
         """Sets this language to this ISO 639-2T code"""
-        if lang_pt2t not in Lang._data["pt2T"]:
-            raise InvalidLanguageValue(lang_pt2t)
-        else:
-            self._pt3 = Lang._data["pt2T"][lang_pt2t]["pt3"]
-            self._pt1 = Lang._data["pt2T"][lang_pt2t]["pt1"]
-            self._pt2b = Lang._data["pt2T"][lang_pt2t]["pt2B"]
-            self._pt2t = lang_pt2t
-            self._name = Lang._data["pt2T"][lang_pt2t]["name"]
+        params = self._get_params("pt2t", lang_pt2t)
+        self._set_attributes(params, lang_pt2t)
+
+    @property
+    def pt3(self):
+        """Gets the ISO 639-3 code of this language"""
+        return self._pt3
+
+    @pt3.setter
+    def pt3(self, lang_pt3):
+        """Sets this language to this ISO 639-3 code"""
+        params = self._get_params("pt3", lang_pt3)
+        self._set_attributes(params, lang_pt3)
+
+    @property
+    def pt5(self):
+        """Gets the ISO 639-5 code of this language"""
+        return self._pt5
+
+    @pt5.setter
+    def pt5(self, lang_pt5):
+        """Sets this language to this ISO 639-5 code"""
+        params = self._get_params("pt5", lang_pt5)
+        self._set_attributes(params, lang_pt5)
 
     @property
     def name(self):
@@ -138,11 +140,28 @@ class Lang:
     @name.setter
     def name(self, lang_name):
         """Sets this language to this ISO 639 name"""
-        if lang_name not in Lang._data["name"]:
-            raise InvalidLanguageValue(lang_name)
-        else:
-            self._pt3 = Lang._data["name"][lang_name]["pt3"]
-            self._pt1 = Lang._data["name"][lang_name]["pt1"]
-            self._pt2b = Lang._data["name"][lang_name]["pt2B"]
-            self._pt2t = Lang._data["name"][lang_name]["pt2T"]
-            self._name = lang_name
+        params = self._get_params("name", lang_name)
+        self._set_attributes(params, lang_name)
+
+    @classmethod
+    def _get_params(cls, key_lang_tag=None, new_lang_value=None):
+        """Get all ISO-639 parameters for this language tag and value
+
+        Return an empty dict if the language parameters are not valid
+        """
+        d = cls._data.get(key_lang_tag, {}).get(new_lang_value, {})
+        if d:
+            d[key_lang_tag] = new_lang_value
+
+        return d
+
+    def _set_attributes(self, lang_params, *args, **kwargs):
+        """Set attributes values to these ISO-639 language parameters
+
+        Raise an error when no language parameter is passed
+        """
+        if not lang_params:
+            raise InvalidLanguageValue(*args, **kwargs)
+
+        for t in TAGS:
+            setattr(self, f"_{t}", lang_params.get(t, ""))
