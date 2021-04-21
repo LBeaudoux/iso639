@@ -64,6 +64,21 @@ An instance of `Lang` can be modified.
 True
 ```
 
+You can easily get the macrolanguage of an individual language.
+```python
+>>> lg = Lang("Wu Chinese")
+>>> lg.macro()
+Lang(name='Chinese', pt1='zh', pt2b='chi', pt2t='zho', pt3='zho', pt5='')
+```
+
+Conversely, you can also list all the individual languages that share a common macrolanguage.
+```python
+>>> lg = Lang("Persian")
+>>> lg.individuals()
+[Lang(name='Iranian Persian', pt1='', pt2b='', pt2t='', pt3='pes', pt5=''), 
+Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
+```
+
 ## Data included in iso639-lang
 
 iso639-lang is based on the official code tables provided by the ISO 639 registration authorities.

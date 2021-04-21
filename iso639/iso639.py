@@ -1,5 +1,5 @@
 from .exceptions import InvalidLanguageValue
-from .mapping import ISO639Mapping
+from .mapping import ISO639Mapping, MacroMapping
 
 
 TAGS = ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5")
@@ -34,6 +34,7 @@ class Lang:
     """
 
     _data = ISO639Mapping().load()
+    _macro = MacroMapping().load()
 
     def __init__(self, *args, **kwargs):
 
@@ -143,6 +144,45 @@ class Lang:
         params = self._get_params("name", lang_name)
         self._set_attributes(params, lang_name)
 
+    def macro(self):
+        """Get the macrolanguage of this individual language
+
+        Returns
+        -------
+        iso639.Lang
+            the macrolanguage of this individual language, if there is one
+        """
+        macro_pt3 = self._get_macro(self._pt3)
+        if macro_pt3:
+            try:
+                macro = Lang(macro_pt3)
+            except InvalidLanguageValue:
+                pass
+            else:
+                return macro
+
+        return
+
+    def individuals(self):
+        """Get all individual languages of this macrolanguage
+
+        Returns
+        -------
+        list of Lang
+            the Lang instances of the individual languages of this 
+            macrolanguage, if there is one
+        """
+        individuals = []
+        for lg in self._get_individuals(self._pt3):
+            try:
+                lang = Lang(lg)
+            except InvalidLanguageValue:
+                pass
+            else:
+                individuals.append(lang)
+
+        return individuals
+
     @classmethod
     def _get_params(cls, key_lang_tag=None, new_lang_value=None):
         """Get all ISO-639 parameters for this language tag and value
@@ -154,6 +194,16 @@ class Lang:
             d[key_lang_tag] = new_lang_value
 
         return d
+
+    @classmethod
+    def _get_macro(cls, pt3):
+        """Get the macrolanguage of this ISO639-3 language code"""
+        return cls._macro["individual"].get(pt3, "")
+
+    @classmethod
+    def _get_individuals(cls, pt3):
+        """Get the individual languages linked to this macrolanguage code"""
+        return cls._macro["macro"].get(pt3, [])
 
     def _set_attributes(self, lang_params, *args, **kwargs):
         """Set attributes values to these ISO-639 language parameters

@@ -178,6 +178,15 @@ class TestLang(unittest.TestCase):
             self.assertEqual(getattr(lg, k), v)
             self.assertEqual(lg, Lang(v))
 
+    def test_macro(self):
+        lg = Lang("cmn")
+        self.assertEqual(lg.macro().pt3, "zho")
+
+    def test_individuals(self):
+        lg = Lang("fas")
+        ind_lgs = {x.pt3 for x in lg.individuals()}
+        self.assertIn("pes", ind_lgs)
+
 
 if __name__ == "__main__":
     unittest.main()
