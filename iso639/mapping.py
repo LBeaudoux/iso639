@@ -9,6 +9,8 @@ FILENAMES = {
     "macro": "iso-639-3-macrolanguages.tab",
     "mapping": "iso-639.json",
     "mapping_macro": "iso-639_macro.json",
+    "deprecated": "iso-639-3_Retirements.tab",
+    "mapping_deprecated": "iso-639_deprecated.json",
 }
 TAGS = ("pt1", "pt2b", "pt2t", "pt3", "pt5", "name")
 
@@ -193,3 +195,61 @@ class MacroMapping:
             k: v for k, v in sorted(mapping["individual"].items())
         }
         return mapping
+
+
+class DeprecatedMapping:
+    """A mapping used to query the deprecated ISO 639-3 efficiently"""
+
+    _fps = {
+        k: resource_filename(__package__, FILENAMES[k])
+        for k in ("deprecated", "mapping_deprecated")
+    }
+
+    def __init__(self):
+
+        self._data = {}
+
+    def load(self):
+        """Load data from local JSON file"""
+        try:
+            with open(self._fps["mapping_deprecated"], encoding="utf-8") as f:
+                self._data = json.load(f)
+        except FileNotFoundError:
+            mapping = self._build()
+            self._data = self._sort_alphabetically(mapping)
+            self.save()
+
+        return self._data
+
+    def save(self):
+        """Save data into local JSON file"""
+        with open(self._fps["mapping_deprecated"], "w", encoding="utf-8") as f:
+            json.dump(self._data, f)
+
+    @classmethod
+    def _build(cls):
+
+        mapping = {}
+        with open(cls._fps["deprecated"], encoding="utf-8") as f:
+            next(f)
+            for line in f:
+                row = line.rstrip().split("\t")
+                mapping[row[0]] = {
+                    k: row[i + 1]
+                    for i, k in enumerate(
+                        [
+                            "ref_name",
+                            "ret_reason",
+                            "change_to",
+                            "ret_remedy",
+                            "effective",
+                        ]
+                    )
+                }
+
+        return mapping
+
+    @staticmethod
+    def _sort_alphabetically(mapping):
+
+        return {k: mapping[k] for k in sorted(mapping.keys())}
