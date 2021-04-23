@@ -1,7 +1,7 @@
 import unittest
 
 from iso639 import Lang
-from iso639.exceptions import InvalidLanguageValue
+from iso639.exceptions import InvalidLanguageValue, DeprecatedLanguageValue
 
 
 class TestLang(unittest.TestCase):
@@ -186,6 +186,21 @@ class TestLang(unittest.TestCase):
         lg = Lang("fas")
         ind_lgs = {x.pt3 for x in lg.individuals()}
         self.assertIn("pes", ind_lgs)
+
+    def test_deprecated_arg(self):
+        with self.assertRaises(DeprecatedLanguageValue):
+            Lang("agp")
+
+    def test_deprecated_kwarg(self):
+        with self.assertRaises(DeprecatedLanguageValue):
+            Lang(pt3="agp")
+
+    def test_deprecated_arg_with_change(self):
+        try:
+            lg = Lang("gli")
+        except DeprecatedLanguageValue as e:
+            lg = Lang(e.change_to)
+            self.assertEqual(lg, Lang("kzk"))
 
 
 if __name__ == "__main__":

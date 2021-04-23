@@ -1,6 +1,5 @@
-from .exceptions import InvalidLanguageValue
-from .mapping import ISO639Mapping, MacroMapping
-
+from .exceptions import InvalidLanguageValue, DeprecatedLanguageValue
+from .mapping import DeprecatedMapping, ISO639Mapping, MacroMapping
 
 TAGS = ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5")
 
@@ -35,6 +34,7 @@ class Lang:
 
     _data = ISO639Mapping().load()
     _macro = MacroMapping().load()
+    _deprecated = DeprecatedMapping().load()
 
     def __init__(self, *args, **kwargs):
 
@@ -44,6 +44,7 @@ class Lang:
             if isinstance(lang, Lang):
                 params = {k[1:]: v for k, v in lang.__dict__.items()}
             elif len(lang) == 3 and lang.lower() == lang:
+                self._assert_not_deprecated(lang)
                 for tag in ("pt3", "pt2b", "pt2t", "pt5"):
                     params = self._get_params(tag, lang)
                     if params:
@@ -53,6 +54,7 @@ class Lang:
             else:
                 params = self._get_params("name", lang)
         elif not args and kwargs:
+            self._assert_not_deprecated(kwargs.get("pt3"))
             a = [self._get_params(tg, lg) for tg, lg in kwargs.items()]
             params = {} if a.count(a[0]) != len(a) else a[0]
 
@@ -169,8 +171,8 @@ class Lang:
         Returns
         -------
         list of Lang
-            the Lang instances of the individual languages of this 
-            macrolanguage, if there is one
+            the Lang instances of the individual languages of this
+            macrolanguage, if it is one
         """
         individuals = []
         for lg in self._get_individuals(self._pt3):
@@ -182,6 +184,18 @@ class Lang:
                 individuals.append(lang)
 
         return individuals
+
+    @classmethod
+    def _assert_not_deprecated(cls, lang_value):
+        """Raise an error when this language value is a deprecated
+        ISO 639-3 code
+        """
+        try:
+            d = cls._deprecated[lang_value]
+        except KeyError:
+            pass
+        else:
+            raise DeprecatedLanguageValue(id=lang_value, **d)
 
     @classmethod
     def _get_params(cls, key_lang_tag=None, new_lang_value=None):
