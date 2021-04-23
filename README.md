@@ -79,6 +79,29 @@ Conversely, you can also list all the individual languages that share a common m
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 ```
 
+When an invalid argument is passed to `Lang`, an `InvalidLanguageValue` exception is raised.
+```python
+>>> from iso639.exceptions import InvalidLanguageValue
+>>> try:
+...     Lang("foobar")
+... except InvalidLanguageValue as e:
+...     e.msg
+... 
+"'foobar' not supported by ISO 639"
+```
+
+When an deprecated argument is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
+```python
+>>> from iso639.exceptions import DeprecatedLanguageValue
+>>> try:
+...     Lang("gsc")
+... except DeprecatedLanguageValue as e:
+...     lg = Lang(e.change_to)
+...     f"{e.name} replaced by {lg.name}"
+...
+'Gascon replaced by Occitan (post 1500)'
+```
+
 ## Data included in iso639-lang
 
 iso639-lang is based on the official code tables provided by the ISO 639 registration authorities.
