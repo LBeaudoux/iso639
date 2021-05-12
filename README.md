@@ -79,7 +79,7 @@ Conversely, you can also list all the individual languages that share a common m
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 ```
 
-When an invalid argument is passed to `Lang`, an `InvalidLanguageValue` exception is raised.
+When an invalid language value is passed to `Lang`, an `InvalidLanguageValue` exception is raised.
 ```python
 >>> from iso639.exceptions import InvalidLanguageValue
 >>> try:
@@ -90,7 +90,7 @@ When an invalid argument is passed to `Lang`, an `InvalidLanguageValue` exceptio
 "'foobar' not supported by ISO 639"
 ```
 
-When an deprecated argument is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
+When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
 ```python
 >>> from iso639.exceptions import DeprecatedLanguageValue
 >>> try:
@@ -104,14 +104,13 @@ When an deprecated argument is passed to `Lang`, a `DeprecatedLanguageValue` exc
 
 ## Data included in iso639-lang
 
-iso639-lang is based on the official code tables provided by the ISO 639 registration authorities.
+As of May 12, 2021, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
  
  
-| Standard  | Name                                                                                       | Registration Authority | First edition | Current   |
-| --------- | ------------------------------------------------------------------------------------------ | ---------------------- | ------------- | --------- |
-| [ISO 639-1](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 1: Alpha-2 code*                                                                       | Infoterm               | 1967          | 2002      |
-| [ISO 639-2](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt) | *Part 2: Alpha-3 code*                                                                       | Library of Congress    | 1998          | 1998      |
-| [ISO 639-3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 3: Alpha-3 code for comprehensive coverage of languages*                               | SIL International      | 2007          | 2007      |
-| ISO 639-4 | *Part 4: Implementation guidelines and general principles for language coding* (not a list)  | ISO/TC 37/SC 2         | 2010          | 2010      |
-| [ISO 639-5](http://id.loc.gov/vocabulary/iso639-5.tsv) | *Part 5: Alpha-3 code for language families and groups*                                      | Library of Congress    | 2008          | 2013      |
-| ISO 639-6 | *Part 6: Alpha-4 representation for comprehensive coverage of language variants* | Geolang                | 2009          | withdrawn |
+| Standard  | Name                                                                                       | Registration Authority |
+| --------- | ------------------------------------------------------------------------------------------ | ---------------------- |
+| [ISO 639-1](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 1: Alpha-2 code*                                                                       | Infoterm               |
+| [ISO 639-2](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt) | *Part 2: Alpha-3 code*                                                                       | Library of Congress    |
+| [ISO 639-3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 3: Alpha-3 code for comprehensive coverage of languages*                               | SIL International      |
+| ISO 639-4 | *Part 4: Implementation guidelines and general principles for language coding* (not a list)  | ISO/TC 37/SC 2         |
+| [ISO 639-5](http://id.loc.gov/vocabulary/iso639-5.tsv) | *Part 5: Alpha-3 code for language families and groups*                                      | Library of Congress    |
