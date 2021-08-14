@@ -180,6 +180,9 @@ class Lang:
                 lang = Lang(lg)
             except InvalidLanguageValue:
                 pass
+            except DeprecatedLanguageValue as e:
+                if e.change_to:
+                    individuals.append(Lang(e.change_to))
             else:
                 individuals.append(lang)
 
