@@ -22,5 +22,5 @@ setuptools.setup(
         "Development Status :: 4 - Beta",
     ],
     python_requires=">=3.6",
-    package_data={"": ["*.tab", "*.txt", "*.tsv", "*.json"]},
+    package_data={"iso639": ["data/*.json"]},
 )

@@ -4,14 +4,14 @@ from operator import itemgetter
 from pkg_resources import resource_filename
 
 FILENAMES = {
-    "core": "iso-639-3.tab",
-    "pt2": "ISO-639-2_utf-8.txt",
-    "pt5": "iso639-5.tsv",
-    "macro": "iso-639-3-macrolanguages.tab",
-    "mapping": "iso-639.json",
-    "mapping_macro": "iso-639_macro.json",
-    "deprecated": "iso-639-3_Retirements.tab",
-    "mapping_deprecated": "iso-639_deprecated.json",
+    "core": "data/iso-639-3.tab",
+    "pt2": "data/ISO-639-2_utf-8.txt",
+    "pt5": "data/iso639-5.tsv",
+    "macro": "data/iso-639-3-macrolanguages.tab",
+    "deprecated": "data/iso-639-3_Retirements.tab",
+    "mapping": "data/iso-639.json",
+    "mapping_macro": "data/iso-639_macro.json",
+    "mapping_deprecated": "data/iso-639_deprecated.json",
 }
 TAGS = ("pt1", "pt2b", "pt2t", "pt3", "pt5", "name")
 
@@ -258,7 +258,7 @@ class DeprecatedMapping:
                 "change_to": change_to,
                 "ret_remedy": ret_remedy,
                 "effective": effective,
-                }
+            }
 
         return mapping
 
