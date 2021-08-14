@@ -7,6 +7,14 @@ from iso639.exceptions import InvalidLanguageValue, DeprecatedLanguageValue
 class TestLang(unittest.TestCase):
     """Test the Lang class."""
 
+    lang_vals = {pt: set(d.keys()) for pt, d in Lang._data.items()}
+    lang_vals["changed_to"] = {
+        d["change_to"] for d in Lang._deprecated.values() if d["change_to"]
+    }
+    lang_vals["deprecated"] = set(Lang._deprecated.keys())
+    lang_vals["macro"] = set(Lang._macro["macro"].keys())
+    lang_vals["individual"] = set(Lang._macro["individual"].keys())
+
     def test_pt1(self):
         lg = Lang("fr")
         self.assertEqual(lg.pt1, "fr")
@@ -188,19 +196,24 @@ class TestLang(unittest.TestCase):
         self.assertIn("pes", ind_lgs)
 
     def test_deprecated_arg(self):
+        for pt3 in self.lang_vals["deprecated"]:
         with self.assertRaises(DeprecatedLanguageValue):
-            Lang("agp")
+                Lang(pt3)
 
     def test_deprecated_kwarg(self):
+        for pt3 in self.lang_vals["deprecated"]:
         with self.assertRaises(DeprecatedLanguageValue):
-            Lang(pt3="agp")
+                Lang(pt3=pt3)
 
-    def test_deprecated_arg_with_change(self):
+    def test_deprecated_with_change_to(self):
+        for pt in ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5"):
+            for lv in self.lang_vals[pt]:
         try:
-            lg = Lang("gli")
+                    Lang(lv)
         except DeprecatedLanguageValue as e:
-            lg = Lang(e.change_to)
-            self.assertEqual(lg, Lang("kzk"))
+                    if e.change_to:
+                        Lang(e.change_to)
+
 
 
 if __name__ == "__main__":

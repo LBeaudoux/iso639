@@ -1,4 +1,5 @@
 import json
+from operator import itemgetter
 
 from pkg_resources import resource_filename
 
@@ -229,22 +230,34 @@ class DeprecatedMapping:
     @classmethod
     def _build(cls):
 
-        mapping = {}
         with open(cls._fps["deprecated"], encoding="utf-8") as f:
-            next(f)
-            for line in f:
-                row = line.rstrip().split("\t")
-                mapping[row[0]] = {
-                    k: row[i + 1]
-                    for i, k in enumerate(
-                        [
-                            "ref_name",
-                            "ret_reason",
-                            "change_to",
-                            "ret_remedy",
-                            "effective",
-                        ]
-                    )
+            rows = [line.rstrip().split("\t") for line in f]
+
+        # make sure that deprecations are ordered chronologically
+        sorted_deprecated = sorted(rows[1:], key=itemgetter(-1))
+
+        mapping = {}
+        for (
+            pt3,
+            ref_name,
+            ret_reason,
+            change_to,
+            ret_remedy,
+            effective,
+        ) in sorted_deprecated:
+            if change_to == pt3:  # avoid infinite loops to self
+                continue
+            # when a deprecation routes to an already deprecated
+            # lang, the older one is canceled
+            if change_to in mapping:
+                del mapping[change_to]
+
+            mapping[pt3] = {
+                "ref_name": ref_name,
+                "ret_reason": ret_reason,
+                "change_to": change_to,
+                "ret_remedy": ret_remedy,
+                "effective": effective,
                 }
 
         return mapping
