@@ -197,23 +197,44 @@ class TestLang(unittest.TestCase):
 
     def test_deprecated_arg(self):
         for pt3 in self.lang_vals["deprecated"]:
-        with self.assertRaises(DeprecatedLanguageValue):
+            with self.assertRaises(DeprecatedLanguageValue):
                 Lang(pt3)
 
     def test_deprecated_kwarg(self):
         for pt3 in self.lang_vals["deprecated"]:
-        with self.assertRaises(DeprecatedLanguageValue):
+            with self.assertRaises(DeprecatedLanguageValue):
                 Lang(pt3=pt3)
 
     def test_deprecated_with_change_to(self):
         for pt in ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5"):
             for lv in self.lang_vals[pt]:
-        try:
+                try:
                     Lang(lv)
-        except DeprecatedLanguageValue as e:
+                except DeprecatedLanguageValue as e:
                     if e.change_to:
                         Lang(e.change_to)
 
+    def test_no_macro_of_macro(self):
+        for lvs in self.lang_vals.values():
+            for lv in lvs:
+                try:
+                    macro = Lang(lv).macro()
+                except DeprecatedLanguageValue:
+                    continue
+                else:
+                    if macro is not None:
+                        self.assertIsNone(macro.macro())
+
+    def test_no_individual_of_individual(self):
+        for lvs in self.lang_vals.values():
+            for lv in lvs:
+                try:
+                    individuals = Lang(lv).individuals()
+                except DeprecatedLanguageValue:
+                    continue
+                else:
+                    for ind in individuals:
+                        self.assertEqual(ind.individuals(), [])
 
 
 if __name__ == "__main__":
