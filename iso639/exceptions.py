@@ -11,8 +11,12 @@ class InvalidLanguageValue(Exception):
 
     def __init__(self, *args, **kwargs):
 
-        arg_str = ", ".join(list(args) + ["=".join(x) for x in kwargs.items()])
-        self.msg = f"'{arg_str}' not supported by ISO 639"
+        pt_msg = (
+            "(*{0}, **{1}). "
+            "Only valid ISO 639 language values are supported as arguments."
+        )
+
+        self.msg = pt_msg.format(args, kwargs)
 
         super().__init__(self.msg)
 

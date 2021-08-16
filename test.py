@@ -7,7 +7,7 @@ from iso639.exceptions import InvalidLanguageValue, DeprecatedLanguageValue
 class TestLang(unittest.TestCase):
     """Test the Lang class."""
 
-    lang_vals = {pt: set(d.keys()) for pt, d in Lang._data.items()}
+    lang_vals = {tg: set(d.keys()) for tg, d in Lang._data.items()}
     lang_vals["changed_to"] = {
         d["change_to"] for d in Lang._deprecated.values() if d["change_to"]
     }
@@ -104,7 +104,7 @@ class TestLang(unittest.TestCase):
 
     def test_equal_languages(self):
         lg1 = Lang("eng")
-        lg2 = Lang("eng")
+        lg2 = Lang("en")
         self.assertEqual(lg1, lg2)
 
     def test_not_equal_languages(self):
@@ -127,7 +127,7 @@ class TestLang(unittest.TestCase):
         lg2 = Lang(lg1)
         self.assertEqual(lg1, lg2)
 
-    def test_multiple_arg(self):
+    def test_multiple_args(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang("fra", "fr")
 
@@ -140,7 +140,7 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "French")
 
-    def test_multiple_kwarg(self):
+    def test_multiple_kwargs(self):
         lg = Lang(pt1="fr", name="French")
         self.assertEqual(lg.pt1, "fr")
         self.assertEqual(lg.pt2b, "fre")
@@ -153,7 +153,7 @@ class TestLang(unittest.TestCase):
         with self.assertRaises(InvalidLanguageValue):
             Lang(pt1="fra")
 
-    def test_kwarg_wrong_second_value(self):
+    def test_kwargs_wrong_second_value(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang(pt1="fr", pt3="deu")
 
@@ -165,26 +165,67 @@ class TestLang(unittest.TestCase):
         with self.assertRaises(InvalidLanguageValue):
             Lang(pt1="fr", foobar="fra")
 
-    def test_no_param(self):
+    def test_no_arg_no_kwarg(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang()
 
-    def test_arg_and_kwarg(self):
+    def test_none_arg(self):
         with self.assertRaises(InvalidLanguageValue):
-            Lang("fra", pt1="fr")
+            Lang(None)
 
-    def test_attribute_setter(self):
-        lg = Lang("spa")
-        for k, v in [
-            ("pt1", "de"),
-            ("pt2b", "fre"),
-            ("pt2t", "deu"),
-            ("pt3", "cmn"),
-            ("name", "Italian"),
-        ]:
-            lg[k] = v
-            self.assertEqual(getattr(lg, k), v)
-            self.assertEqual(lg, Lang(v))
+    def test_none_kwarg(self):
+        for tag in Lang._tags:
+            kwargs = {tag: ""}
+            with self.assertRaises(InvalidLanguageValue):
+                Lang(**kwargs)
+
+    def test_empty_string_arg(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("")
+
+    def test_empty_string_kwarg(self):
+        for tag in Lang._tags:
+            kwargs = {tag: ""}
+            with self.assertRaises(InvalidLanguageValue):
+                Lang(**kwargs)
+
+    def test_arg_and_kwarg(self):
+        lg = Lang("fra", pt1="fr")
+        self.assertEqual(lg.pt1, "fr")
+        self.assertEqual(lg.pt2b, "fre")
+        self.assertEqual(lg.pt2t, "fra")
+        self.assertEqual(lg.pt3, "fra")
+        self.assertEqual(lg.pt5, "")
+        self.assertEqual(lg.name, "French")
+
+    def test_arg_and_kwarg_nok(self):
+        with self.assertRaises(InvalidLanguageValue):
+            Lang("fra", pt1="deu")
+
+    def test_repr(self):
+        lg = Lang("alu")
+        s = (
+            """Lang(name="'Are'are", pt1='', pt2b='', """
+            """pt2t='', pt3='alu', pt5='')"""
+        )
+        self.assertEqual(s, repr(lg))
+
+    def test_immutable(self):
+        lg = Lang("fra")
+        with self.assertRaises(AttributeError):
+            lg.pt1 = "en"
+
+    def test_hashable_set_element(self):
+        lg = Lang("fra")
+        s = set()
+        s.add(lg)
+        self.assertIn(lg, s)
+
+    def test_hashable_dict_key(self):
+        lg = Lang("fra")
+        d = {}
+        d.update({lg: "foobar"})
+        self.assertEqual(d[lg], "foobar")
 
     def test_macro(self):
         lg = Lang("cmn")
