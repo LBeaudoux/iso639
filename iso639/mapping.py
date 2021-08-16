@@ -1,5 +1,5 @@
 import json
-from operator import itemgetter
+from collections import namedtuple
 
 from pkg_resources import resource_filename
 
@@ -62,23 +62,37 @@ class ISO639Mapping:
     @classmethod
     def _build_core_mapping(cls):
         """Builds the core ISO-639 mapping from the ISO 639-3 tab file"""
+        Iso6393 = namedtuple(
+            "Iso6393",
+            [
+                "Id",
+                "Part2B",
+                "Part2T",
+                "Part1",
+                "Scope",
+                "Language_Type",
+                "Ref_Name",
+            ],
+        )
         mapping = {}
         with open(cls._fps["core"], encoding="utf-8") as f:
             next(f)
             for line in f:
                 row = line.rstrip().split("\t")
-                params = {
-                    "pt1": row[3],
-                    "pt2b": row[1],
-                    "pt2t": row[2],
-                    "pt3": row[0],
+                iso6393 = Iso6393(*row[:7])
+
+                dict_iso6393 = {
+                    "pt1": iso6393.Part1,
+                    "pt2b": iso6393.Part2B,
+                    "pt2t": iso6393.Part2T,
+                    "pt3": iso6393.Id,
                     "pt5": "",
-                    "name": row[6],
+                    "name": iso6393.Ref_Name,
                 }
                 for tag in TAGS:
-                    if params[tag]:
-                        mapping.setdefault(tag, {})[params[tag]] = {
-                            k: v for k, v in params.items() if k != tag
+                    if dict_iso6393[tag]:
+                        mapping.setdefault(tag, {})[dict_iso6393[tag]] = {
+                            k: v for k, v in dict_iso6393.items() if k != tag
                         }
 
         return mapping
@@ -86,16 +100,28 @@ class ISO639Mapping:
     @classmethod
     def _complete_part2(cls, mapping):
         """Complete mapping with pt2 codes not covered by pt3"""
+        Iso6392 = namedtuple(
+            "Iso6392",
+            [
+                "alpha3_bibliographic",
+                "alpha3_terminologic",
+                "alpha2",
+                "English_name",
+                "French_name",
+            ],
+        )
         with open(cls._fps["pt2"], encoding="utf-8-sig") as f:
             for line in f:
                 row = line.rstrip().split("|")
+                iso6392 = Iso6392(*row)
+
                 params = {
-                    "pt1": row[2],
-                    "pt2b": row[0],
-                    "pt2t": row[1],
+                    "pt1": iso6392.alpha2,
+                    "pt2b": iso6392.alpha3_bibliographic,
+                    "pt2t": iso6392.alpha3_terminologic,
                     "pt3": "",
                     "pt5": "",
-                    "name": row[3],
+                    "name": iso6392.English_name,
                 }
                 if len(params["pt2b"]) == 3:
                     for tag in TAGS:
@@ -108,17 +134,22 @@ class ISO639Mapping:
     @classmethod
     def _add_part5(cls, mapping):
         """Add ISO 639-2 pt5 codes to mapping"""
+        Iso6395 = namedtuple(
+            "Iso6395", ["URI", "code", "Label_English", "Label_French"]
+        )
         with open(cls._fps["pt5"], encoding="utf-8") as f:
             next(f)
             for line in f:
                 row = line.rstrip().split("\t")
+                iso6395 = Iso6395(*row)
+
                 params = {
                     "pt1": "",
                     "pt2b": "",
                     "pt2t": "",
                     "pt3": "",
-                    "pt5": row[1],
-                    "name": row[2],
+                    "pt5": iso6395.code,
+                    "name": iso6395.Label_English,
                 }
                 if len(params["pt5"]) == 3:
                     for tag in TAGS:
@@ -179,13 +210,16 @@ class MacroMapping:
     @classmethod
     def _build(cls):
 
+        MacroLanguage = namedtuple("Macro", ["M_Id", "I_Id", "I_Status"])
         mapping = {k: {} for k in ("macro", "individual")}
         with open(cls._fps["macro"], encoding="utf-8") as f:
             next(f)
             for line in f:
                 row = line.rstrip().split("\t")
-                mapping["macro"].setdefault(row[0], []).append(row[1])
-                mapping["individual"][row[1]] = row[0]
+                macro = MacroLanguage(*row)
+
+                mapping["macro"].setdefault(macro.M_Id, []).append(macro.I_Id)
+                mapping["individual"][macro.I_Id] = macro.M_Id
 
         return mapping
 
@@ -230,34 +264,42 @@ class DeprecatedMapping:
     @classmethod
     def _build(cls):
 
+        Retirement = namedtuple(
+            "Retirement",
+            [
+                "Id",
+                "Ref_Name",
+                "Ret_Reason",
+                "Change_To",
+                "Ret_Remedy",
+                "Effective",
+            ],
+        )
+
         with open(cls._fps["deprecated"], encoding="utf-8") as f:
-            rows = [line.rstrip().split("\t") for line in f]
+            retirements = [
+                Retirement(*line.rstrip().split("\t")) for line in f
+            ]
 
         # make sure that deprecations are ordered chronologically
-        sorted_deprecated = sorted(rows[1:], key=itemgetter(-1))
+        sorted_retirements = sorted(retirements[1:], key=lambda x: x.Effective)
 
         mapping = {}
-        for (
-            pt3,
-            ref_name,
-            ret_reason,
-            change_to,
-            ret_remedy,
-            effective,
-        ) in sorted_deprecated:
-            if change_to == pt3:  # avoid infinite loops to self
+        for ret in sorted_retirements:
+            # avoid infinite loops to self
+            if ret.Change_To == ret.Id:
                 continue
             # when a deprecation routes to an already deprecated
             # lang, the older one is canceled
-            if change_to in mapping:
-                del mapping[change_to]
+            if ret.Change_To in mapping:
+                del mapping[ret.Change_To]
 
-            mapping[pt3] = {
-                "ref_name": ref_name,
-                "ret_reason": ret_reason,
-                "change_to": change_to,
-                "ret_remedy": ret_remedy,
-                "effective": effective,
+            mapping[ret.Id] = {
+                "ref_name": ret.Ref_Name,
+                "ret_reason": ret.Ret_Reason,
+                "change_to": ret.Change_To,
+                "ret_remedy": ret.Ret_Remedy,
+                "effective": ret.Effective,
             }
 
         return mapping
