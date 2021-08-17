@@ -157,6 +157,9 @@ class TestLang(unittest.TestCase):
         with self.assertRaises(InvalidLanguageValue):
             Lang(pt1="fr", pt3="deu")
 
+    def test_kwargs_right_empty_second_value(self):
+        Lang(pt1="fr", pt5="")
+
     def test_kwarg_wrong_key(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang(foobar="fr")

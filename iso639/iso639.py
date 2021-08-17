@@ -229,7 +229,8 @@ class Lang(tuple):
         if all(isinstance(ka, str) for ka in kwargs.values()):
             cls._assert_not_deprecated(kwargs.get("pt3"))
             for tg, lg in kwargs.items():
-                params.add(cls._get_language_values(tg, lg))
+                if lg:
+                    params.add(cls._get_language_values(tg, lg))
         else:
             params.add(tuple())
 
