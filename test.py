@@ -227,6 +227,21 @@ class TestLang(unittest.TestCase):
         d.update({lg: "foobar"})
         self.assertEqual(d[lg], "foobar")
 
+    def test_scope(self):
+        self.assertEqual(Lang("fra").scope(), "Individual")
+        self.assertEqual(Lang("zh").scope(), "Macrolanguage")
+        self.assertEqual(Lang("und").scope(), "Special")
+        self.assertIsNone(Lang("ber").scope())
+
+    def test_type(self):
+        self.assertEqual(Lang("lat").type(), "Ancient")
+        self.assertEqual(Lang("epo").type(), "Constructed")
+        self.assertEqual(Lang("djf").type(), "Extinct")
+        self.assertEqual(Lang("fro").type(), "Historical")
+        self.assertEqual(Lang("fra").type(), "Living")
+        self.assertEqual(Lang("und").type(), "Special")
+        self.assertIsNone(Lang("ber").type())
+
     def test_macro(self):
         lg = Lang("cmn")
         self.assertEqual(lg.macro().pt3, "zho")

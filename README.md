@@ -16,7 +16,7 @@ Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5='')
 iso639-lang allows you to switch from one language code to another easily. 
 There’s no need to manually download or parse data files, just use the `Lang` class!
 
-ISO 639-1, ISO 639-2, ISO 639-3  and ISO 639-5 parts are all supported.
+ISO 639-1, ISO 639-2, ISO 639-3 and ISO 639-5 parts are all supported.
 
 ## Installing iso639-lang and Supported Versions
 
@@ -53,21 +53,34 @@ Begin by importing the `Lang` class:
 ''
 ```
 
-An instance of `Lang` can be modified.
+`Lang` instances are sortable by name and hashable.
 ```python
->>> lg.pt1 = 'de'
->>> lg.name
-'German'
+>>> langs = [Lang("deu"), Lang("eng"), Lang("rus"), Lang("eng")]
+>>> [lg.name for lg in sorted(langs)]
+['English', 'English', 'German', 'Russian']
+>>> [lg.pt3 for lg in set(langs)]
+['eng', 'rus', 'deu']
 ```
 
-`Lang` instances are comparable to each other.
+### Language Types
+
+The type of a language is accessible thanks to the `type` method.
 ```python
->>> other_lg = Lang("deu")
->>> lg == other_lg
-True
+>>> lg = Lang("Latin")
+>>> lg.type()
+'Ancient'
 ```
 
-You can easily get the macrolanguage of an individual language.
+### Macrolanguages
+
+You can easily determine whether a language is a macrolanguage or an individual language.
+```python
+>>> lg = Lang("Arabic")
+>>> lg.scope()
+'Macrolanguage'
+```
+
+Use the `macro` method to get the macrolanguage of an individual language.
 ```python
 >>> lg = Lang("Wu Chinese")
 >>> lg.macro()
@@ -81,6 +94,8 @@ Conversely, you can also list all the individual languages that share a common m
 [Lang(name='Iranian Persian', pt1='', pt2b='', pt2t='', pt3='pes', pt5=''), 
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 ```
+
+### Exceptions
 
 When an invalid language value is passed to `Lang`, an `InvalidLanguageValue` exception is raised.
 ```python
@@ -105,9 +120,9 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 'Gascon replaced by Occitan (post 1500)'
 ```
 
-## Data included in iso639-lang
+## Sources of data used by iso639-lang
 
-As of May 12, 2021, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
+As of August 17, 2021, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
  
  
 | Standard  | Name                                                                                       | Registration Authority |

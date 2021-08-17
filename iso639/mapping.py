@@ -10,44 +10,140 @@ FILENAMES = {
     "macro": "data/iso-639-3-macrolanguages.tab",
     "deprecated": "data/iso-639-3_Retirements.tab",
     "mapping": "data/iso-639.json",
+    "mapping_scope": "data/iso-639_scope.json",
+    "mapping_type": "data/iso-639_type.json",
     "mapping_macro": "data/iso-639_macro.json",
     "mapping_deprecated": "data/iso-639_deprecated.json",
 }
 TAGS = ("pt1", "pt2b", "pt2t", "pt3", "pt5", "name")
 
 
-class ISO639Mapping:
-    """A mapping used to query the ISO 639 values efficiently"""
+def get_file_path(file_alias):
+    """Get the path of a local data file"""
+    return resource_filename(__package__, FILENAMES[file_alias])
 
-    _fps = {
-        k: resource_filename(__package__, FILENAMES[k])
-        for k in ("core", "pt2", "pt5", "mapping")
-    }
+
+def read_core():
+    """Generates core ISO 639 data from its source file"""
+    Iso6393 = namedtuple(
+        "Iso6393",
+        [
+            "Id",
+            "Part2B",
+            "Part2T",
+            "Part1",
+            "Scope",
+            "Language_Type",
+            "Ref_Name",
+        ],
+    )
+    with open(get_file_path("core"), encoding="utf-8") as f:
+        next(f)
+        for line in f:
+            row = line.rstrip().split("\t")
+            yield Iso6393(*row[:7])
+
+
+def read_pt2():
+    """Generates ISO 639-2 data from its source file"""
+    Iso6392 = namedtuple(
+        "Iso6392",
+        [
+            "alpha3_bibliographic",
+            "alpha3_terminologic",
+            "alpha2",
+            "English_name",
+            "French_name",
+        ],
+    )
+    with open(get_file_path("pt2"), encoding="utf-8-sig") as f:
+        for line in f:
+            row = line.rstrip().split("|")
+            yield Iso6392(*row)
+
+
+def read_pt5():
+    """Generates ISO 639-5 data from its source file"""
+    Iso6395 = namedtuple(
+        "Iso6395", ["URI", "code", "Label_English", "Label_French"]
+    )
+    with open(get_file_path("pt5"), encoding="utf-8") as f:
+        next(f)
+        for line in f:
+            row = line.rstrip().split("\t")
+            yield Iso6395(*row)
+
+
+def read_macro():
+    """Generates ISO 639 macrolanguage data from its source file"""
+    MacroLanguage = namedtuple("Macro", ["M_Id", "I_Id", "I_Status"])
+    with open(get_file_path("macro"), encoding="utf-8") as f:
+        next(f)
+        for line in f:
+            row = line.rstrip().split("\t")
+            yield MacroLanguage(*row)
+
+
+def read_deprecated():
+    """Generates ISO 639-3 deprecated language data from its source
+    file
+    """
+    Retirement = namedtuple(
+        "Retirement",
+        [
+            "Id",
+            "Ref_Name",
+            "Ret_Reason",
+            "Change_To",
+            "Ret_Remedy",
+            "Effective",
+        ],
+    )
+    with open(get_file_path("deprecated"), encoding="utf-8") as f:
+        next(f)
+        for line in f:
+            row = line.rstrip().split("\t")
+            yield Retirement(*row)
+
+
+class Mapping(object):
+    """A base class for handling data mappings stored locally as
+    JSON files
+    """
+
+    _file_path = ""
 
     def __init__(self):
-
         self._data = {}
 
     def load(self):
-        """Load data from local JSON file"""
         try:
-            with open(self._fps["mapping"], encoding="utf-8") as f:
+            with open(self._file_path, encoding="utf-8") as f:
                 self._data = json.load(f)
         except FileNotFoundError:
-            self.build()
-            self.save()
-        else:
-            # remap if the mapping is incomplete
-            if any(k not in self._data.keys() for k in TAGS):
-                self.build()
-                self.save()
+            self._data = self.build()
+            with open(self._file_path, "w", encoding="utf-8") as f:
+                json.dump(self._data, f)
 
         return self._data
 
-    def save(self):
-        """Save data into local JSON file"""
-        with open(self._fps["mapping"], "w", encoding="utf-8") as f:
-            json.dump(self._data, f)
+    def build(self):
+        mapping = self._build()
+        mapping = self._sort_alphabetically(mapping)
+
+        return mapping
+
+    @staticmethod
+    def _sort_alphabetically(mapping):
+        return {k: mapping[k] for k in sorted(mapping.keys())}
+
+
+class ISO639Mapping(Mapping):
+    """A mapping used to efficiently query the ISO 639 values
+    in-memory
+    """
+
+    _file_path = get_file_path("mapping")
 
     def build(self):
         """Build the JSON file from the official ISO 639 code tables
@@ -56,119 +152,80 @@ class ISO639Mapping:
         mapping = self._build_core_mapping()
         mapping = self._complete_part2(mapping)
         mapping = self._add_part5(mapping)
+        mapping = self._sort_alphabetically(mapping)
 
-        self._data = self._sort_alphabetically(mapping)
+        return mapping
 
-    @classmethod
-    def _build_core_mapping(cls):
-        """Builds the core ISO-639 mapping from the ISO 639-3 tab file"""
-        Iso6393 = namedtuple(
-            "Iso6393",
-            [
-                "Id",
-                "Part2B",
-                "Part2T",
-                "Part1",
-                "Scope",
-                "Language_Type",
-                "Ref_Name",
-            ],
-        )
+    @staticmethod
+    def _build_core_mapping():
+        # the ISO 639-3 code table is used to build the core of
+        # the mapping
         mapping = {}
-        with open(cls._fps["core"], encoding="utf-8") as f:
-            next(f)
-            for line in f:
-                row = line.rstrip().split("\t")
-                iso6393 = Iso6393(*row[:7])
+        for iso6393 in read_core():
+            dict_iso6393 = {
+                "pt1": iso6393.Part1,
+                "pt2b": iso6393.Part2B,
+                "pt2t": iso6393.Part2T,
+                "pt3": iso6393.Id,
+                "pt5": "",
+                "name": iso6393.Ref_Name,
+            }
+            for tag in TAGS:
+                if dict_iso6393[tag]:
+                    mapping.setdefault(tag, {})[dict_iso6393[tag]] = {
+                        k: v for k, v in dict_iso6393.items() if k != tag
+                    }
 
-                dict_iso6393 = {
-                    "pt1": iso6393.Part1,
-                    "pt2b": iso6393.Part2B,
-                    "pt2t": iso6393.Part2T,
-                    "pt3": iso6393.Id,
-                    "pt5": "",
-                    "name": iso6393.Ref_Name,
-                }
+        return mapping
+
+    @staticmethod
+    def _complete_part2(mapping):
+        # complete core mapping with ISO 639-2 codes not covered by
+        # ISO 639-3
+        for iso6392 in read_pt2():
+            params = {
+                "pt1": iso6392.alpha2,
+                "pt2b": iso6392.alpha3_bibliographic,
+                "pt2t": iso6392.alpha3_terminologic,
+                "pt3": "",
+                "pt5": "",
+                "name": iso6392.English_name,
+            }
+            if len(params["pt2b"]) == 3:
                 for tag in TAGS:
-                    if dict_iso6393[tag]:
-                        mapping.setdefault(tag, {})[dict_iso6393[tag]] = {
-                            k: v for k, v in dict_iso6393.items() if k != tag
+                    if params[tag] and params[tag] not in mapping[tag]:
+                        mapping.setdefault(tag, {})[params[tag]] = {
+                            k: v for k, v in params.items() if k != tag
                         }
-
         return mapping
 
-    @classmethod
-    def _complete_part2(cls, mapping):
-        """Complete mapping with pt2 codes not covered by pt3"""
-        Iso6392 = namedtuple(
-            "Iso6392",
-            [
-                "alpha3_bibliographic",
-                "alpha3_terminologic",
-                "alpha2",
-                "English_name",
-                "French_name",
-            ],
-        )
-        with open(cls._fps["pt2"], encoding="utf-8-sig") as f:
-            for line in f:
-                row = line.rstrip().split("|")
-                iso6392 = Iso6392(*row)
-
-                params = {
-                    "pt1": iso6392.alpha2,
-                    "pt2b": iso6392.alpha3_bibliographic,
-                    "pt2t": iso6392.alpha3_terminologic,
-                    "pt3": "",
-                    "pt5": "",
-                    "name": iso6392.English_name,
-                }
-                if len(params["pt2b"]) == 3:
-                    for tag in TAGS:
-                        if params[tag] and params[tag] not in mapping[tag]:
-                            mapping.setdefault(tag, {})[params[tag]] = {
-                                k: v for k, v in params.items() if k != tag
-                            }
-        return mapping
-
-    @classmethod
-    def _add_part5(cls, mapping):
-        """Add ISO 639-2 pt5 codes to mapping"""
-        Iso6395 = namedtuple(
-            "Iso6395", ["URI", "code", "Label_English", "Label_French"]
-        )
-        with open(cls._fps["pt5"], encoding="utf-8") as f:
-            next(f)
-            for line in f:
-                row = line.rstrip().split("\t")
-                iso6395 = Iso6395(*row)
-
-                params = {
-                    "pt1": "",
-                    "pt2b": "",
-                    "pt2t": "",
-                    "pt3": "",
-                    "pt5": iso6395.code,
-                    "name": iso6395.Label_English,
-                }
-                if len(params["pt5"]) == 3:
-                    for tag in TAGS:
-                        if params[tag] and params[tag] not in mapping.get(
-                            tag, {}
-                        ):
-                            mapping.setdefault(tag, {})[params[tag]] = {
-                                k: v for k, v in params.items() if k != tag
-                            }
-                # map pt5 and pt2b
-                if params["pt5"] in mapping["pt2b"]:
-                    mapping["pt2b"][params["pt5"]]["pt5"] = params["pt5"]
-                    mapping["pt5"][params["pt5"]]["pt2b"] = params["pt5"]
+    @staticmethod
+    def _add_part5(mapping):
+        # complete core mapping with ISO 639-5 codes
+        for iso6395 in read_pt5():
+            params = {
+                "pt1": "",
+                "pt2b": "",
+                "pt2t": "",
+                "pt3": "",
+                "pt5": iso6395.code,
+                "name": iso6395.Label_English,
+            }
+            if len(params["pt5"]) == 3:
+                for tag in TAGS:
+                    if params[tag] and params[tag] not in mapping.get(tag, {}):
+                        mapping.setdefault(tag, {})[params[tag]] = {
+                            k: v for k, v in params.items() if k != tag
+                        }
+            # map pt5 and pt2b
+            if params["pt5"] in mapping["pt2b"]:
+                mapping["pt2b"][params["pt5"]]["pt5"] = params["pt5"]
+                mapping["pt5"][params["pt5"]]["pt2b"] = params["pt5"]
 
         return mapping
 
     @staticmethod
     def _sort_alphabetically(mapping):
-        """Sort language codes and names alphabetically in the mapping"""
         sorted_data = {}
         for tag, d1 in mapping.items():
             sorted_data[tag] = {lg: d2 for lg, d2 in sorted(d1.items())}
@@ -178,111 +235,81 @@ class ISO639Mapping:
         return mapping
 
 
-class MacroMapping:
-    """A mapping used to query the ISO 639 macrolanguages efficiently"""
+class ScopeMapping(Mapping):
+    """A mapping used to efficiently query the ISO 639-3
+    languages' scopes in-memory
+    """
 
-    _fps = {
-        k: resource_filename(__package__, FILENAMES[k])
-        for k in ("macro", "mapping_macro")
-    }
+    _file_path = get_file_path("mapping_scope")
 
-    def __init__(self):
+    @staticmethod
+    def _build():
+        return {iso6393.Id: iso6393.Scope for iso6393 in read_core()}
 
-        self._data = {}
 
-    def load(self):
-        """Load data from local JSON file"""
-        try:
-            with open(self._fps["mapping_macro"], encoding="utf-8") as f:
-                self._data = json.load(f)
-        except FileNotFoundError:
-            mapping = self._build()
-            self._data = self._sort_alphabetically(mapping)
-            self.save()
+class TypeMapping(Mapping):
+    """A mapping used to efficiently query the ISO 639-3
+    languages' types in-memory
+    """
 
-        return self._data
+    _file_path = get_file_path("mapping_type")
 
-    def save(self):
-        """Save data into local JSON file"""
-        with open(self._fps["mapping_macro"], "w", encoding="utf-8") as f:
-            json.dump(self._data, f)
+    @staticmethod
+    def _build():
+        return {iso6393.Id: iso6393.Language_Type for iso6393 in read_core()}
 
-    @classmethod
-    def _build(cls):
 
-        MacroLanguage = namedtuple("Macro", ["M_Id", "I_Id", "I_Status"])
-        mapping = {k: {} for k in ("macro", "individual")}
-        with open(cls._fps["macro"], encoding="utf-8") as f:
-            next(f)
-            for line in f:
-                row = line.rstrip().split("\t")
-                macro = MacroLanguage(*row)
+class MacroMapping(Mapping):
+    """A mapping used to efficiently query the ISO 639-3
+    macrolanguages values in-memory
+    """
 
-                mapping["macro"].setdefault(macro.M_Id, []).append(macro.I_Id)
-                mapping["individual"][macro.I_Id] = macro.M_Id
+    _file_path = get_file_path("mapping_macro")
+
+    def build(self):
+        """Build the mapping for the ISO 639-3 macrolanguages"""
+        mapping = self._build()
+        mapping = self._sort_alphabetically(mapping)
+
+        return mapping
+
+    @staticmethod
+    def _build():
+        mapping = {}
+        for macro in read_macro():
+            mapping.setdefault("macro", {}).setdefault(macro.M_Id, []).append(
+                macro.I_Id
+            )
+            mapping.setdefault("individual", {})[macro.I_Id] = macro.M_Id
 
         return mapping
 
     @staticmethod
     def _sort_alphabetically(mapping):
-
         mapping["individual"] = {
             k: v for k, v in sorted(mapping["individual"].items())
         }
         return mapping
 
 
-class DeprecatedMapping:
-    """A mapping used to query the deprecated ISO 639-3 efficiently"""
+class DeprecatedMapping(Mapping):
+    """A mapping used to efficiently query the ISO 639-3
+    deprecated languages in-memory
+    """
 
-    _fps = {
-        k: resource_filename(__package__, FILENAMES[k])
-        for k in ("deprecated", "mapping_deprecated")
-    }
+    _file_path = get_file_path("mapping_deprecated")
 
-    def __init__(self):
+    def build(self):
+        mapping = self._build()
+        mapping = self._sort_alphabetically(mapping)
 
-        self._data = {}
+        return mapping
 
-    def load(self):
-        """Load data from local JSON file"""
-        try:
-            with open(self._fps["mapping_deprecated"], encoding="utf-8") as f:
-                self._data = json.load(f)
-        except FileNotFoundError:
-            mapping = self._build()
-            self._data = self._sort_alphabetically(mapping)
-            self.save()
-
-        return self._data
-
-    def save(self):
-        """Save data into local JSON file"""
-        with open(self._fps["mapping_deprecated"], "w", encoding="utf-8") as f:
-            json.dump(self._data, f)
-
-    @classmethod
-    def _build(cls):
-
-        Retirement = namedtuple(
-            "Retirement",
-            [
-                "Id",
-                "Ref_Name",
-                "Ret_Reason",
-                "Change_To",
-                "Ret_Remedy",
-                "Effective",
-            ],
-        )
-
-        with open(cls._fps["deprecated"], encoding="utf-8") as f:
-            retirements = [
-                Retirement(*line.rstrip().split("\t")) for line in f
-            ]
-
+    @staticmethod
+    def _build():
+        retirements = [ret for ret in read_deprecated()]
         # make sure that deprecations are ordered chronologically
-        sorted_retirements = sorted(retirements[1:], key=lambda x: x.Effective)
+        sorted_retirements = sorted(retirements, key=lambda x: x.Effective)
 
         mapping = {}
         for ret in sorted_retirements:
@@ -303,8 +330,3 @@ class DeprecatedMapping:
             }
 
         return mapping
-
-    @staticmethod
-    def _sort_alphabetically(mapping):
-
-        return {k: mapping[k] for k in sorted(mapping.keys())}

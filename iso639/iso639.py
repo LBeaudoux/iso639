@@ -1,7 +1,7 @@
 from operator import itemgetter
 
+from . import mapping
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
-from .mapping import DeprecatedMapping, ISO639Mapping, MacroMapping
 
 
 class Lang(tuple):
@@ -41,9 +41,21 @@ class Lang(tuple):
     """
 
     _tags = ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5")
-    _data = ISO639Mapping().load()
-    _macro = MacroMapping().load()
-    _deprecated = DeprecatedMapping().load()
+    _abrs = {
+        "A": "Ancient",
+        "C": "Constructed",
+        "E": "Extinct",
+        "H": "Historical",
+        "I": "Individual",
+        "L": "Living",
+        "M": "Macrolanguage",
+        "S": "Special",
+    }
+    _data = mapping.ISO639Mapping().load()
+    _scope = mapping.ScopeMapping().load()
+    _type = mapping.TypeMapping().load()
+    _macro = mapping.MacroMapping().load()
+    _deprecated = mapping.DeprecatedMapping().load()
 
     __slots__ = ()  # set immutability of Lang
 
@@ -125,6 +137,31 @@ class Lang(tuple):
     def pt5(self):
         """Gets the ISO 639-5 code of this language"""
         return tuple.__getitem__(self, 5)
+
+    def scope(self):
+        """Gets the ISO 639-3 scope of this language
+
+        Returns
+        -------
+        str
+            the ISO 639-3 scope of this language among 'Individual',
+            'Macrolanguage' and 'Special'.
+            None is returned by not ISO 639-3 languages.
+        """
+        return self._get_scope(self.pt3)
+
+    def type(self):
+        """Gets the ISO 639-3 type of this language
+
+        Returns
+        -------
+        str
+            the ISO 639-3 type of this language among 'Ancient',
+            'Constructed', 'Extinct', 'Historical', 'Living' and
+            'Special'.
+            None is returned by not ISO 639-3 languages.
+        """
+        return self._get_type(self.pt3)
 
     def macro(self):
         """Get the macrolanguage of this individual language
@@ -218,6 +255,18 @@ class Lang(tuple):
             language_tuple = itemgetter(*cls._tags)(language_dict)
 
         return language_tuple
+
+    @classmethod
+    def _get_scope(cls, pt3_value):
+        abr = cls._scope.get(pt3_value, "")
+
+        return cls._abrs.get(abr) if abr else None
+
+    @classmethod
+    def _get_type(cls, pt3_value):
+        abr = cls._type.get(pt3_value, "")
+
+        return cls._abrs.get(abr) if abr else None
 
     @classmethod
     def _get_macro(cls, pt3_value):
