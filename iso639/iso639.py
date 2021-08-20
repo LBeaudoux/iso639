@@ -98,10 +98,12 @@ class Lang(tuple):
         return hash(repr(self))
 
     def __eq__(self, other):
-        return isinstance(other, Lang) and hash(other) == hash(self)
+        return type(other) == type(self) and hash(other) == hash(self)
 
     def __lt__(self, other):
-        return other.name and self.name < other.name
+        return (
+            type(other) == type(self) and other.name and self.name < other.name
+        )
 
     def __getnewargs__(self):
         unpickling_args = (self.name,)
