@@ -1,7 +1,8 @@
 from operator import itemgetter
+from typing import Union, List
 
-from . import mapping
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
+from .mapping import load_mapping
 
 
 class Lang(tuple):
@@ -16,8 +17,7 @@ class Lang(tuple):
     Attributes
     ----------
     name : str
-        ISO 639-3 reference language name if there is one, ISO 639-2 or
-        ISO 639-5 English name otherwise
+        ISO 639-3 reference language name or ISO 639-5 English name
     pt1 : str
         two-letter ISO 639-1 code, if there is one
     pt2b : str
@@ -51,15 +51,16 @@ class Lang(tuple):
         "M": "Macrolanguage",
         "S": "Special",
     }
-    _data = mapping.ISO639Mapping().load()
-    _scope = mapping.ScopeMapping().load()
-    _type = mapping.TypeMapping().load()
-    _macro = mapping.MacroMapping().load()
-    _deprecated = mapping.DeprecatedMapping().load()
+
+    _data = load_mapping("mapping_data")
+    _scope = load_mapping("mapping_scope")
+    _type = load_mapping("mapping_type")
+    _deprecated = load_mapping("mapping_deprecated")
+    _macro = load_mapping("mapping_macro")
 
     __slots__ = ()  # set immutability of Lang
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args: Union[str, "Lang"], **kwargs: str):
         # validate positional argument
         if len(args) == 1:
             args_values = cls._validate_arg(args[0])
@@ -111,36 +112,36 @@ class Lang(tuple):
         return unpickling_args
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Gets the ISO 639 name of this language"""
         return tuple.__getitem__(self, 0)
 
     @property
-    def pt1(self):
+    def pt1(self) -> str:
         """Gets the ISO 639-1 code of this language"""
         return tuple.__getitem__(self, 1)
 
     @property
-    def pt2b(self):
+    def pt2b(self) -> str:
         """Gets the ISO 639-2B code of this language"""
         return tuple.__getitem__(self, 2)
 
     @property
-    def pt2t(self):
+    def pt2t(self) -> str:
         """Gets the ISO 639-2T code of this language"""
         return tuple.__getitem__(self, 3)
 
     @property
-    def pt3(self):
+    def pt3(self) -> str:
         """Gets the ISO 639-3 code of this language"""
         return tuple.__getitem__(self, 4)
 
     @property
-    def pt5(self):
+    def pt5(self) -> str:
         """Gets the ISO 639-5 code of this language"""
         return tuple.__getitem__(self, 5)
 
-    def scope(self):
+    def scope(self) -> str:
         """Gets the ISO 639-3 scope of this language
 
         Returns
@@ -152,7 +153,7 @@ class Lang(tuple):
         """
         return self._get_scope(self.pt3)
 
-    def type(self):
+    def type(self) -> str:
         """Gets the ISO 639-3 type of this language
 
         Returns
@@ -165,7 +166,7 @@ class Lang(tuple):
         """
         return self._get_type(self.pt3)
 
-    def macro(self):
+    def macro(self) -> "Lang":
         """Get the macrolanguage of this individual language
 
         Returns
@@ -184,7 +185,7 @@ class Lang(tuple):
 
         return
 
-    def individuals(self):
+    def individuals(self) -> List["Lang"]:
         """Get all individual languages of this macrolanguage
 
         Returns
@@ -210,7 +211,7 @@ class Lang(tuple):
     @classmethod
     def _validate_arg(cls, arg):
         if isinstance(arg, Lang):
-            return tuple(getattr(arg, tag) for tag in cls._tags)
+            return tuple(map(lambda x: getattr(arg, x), cls._tags))
         elif isinstance(arg, str):
             if len(arg) == 3 and arg.lower() == arg:
                 cls._assert_not_deprecated(arg)
@@ -222,19 +223,14 @@ class Lang(tuple):
                 return cls._get_language_values("pt1", arg)
             else:
                 return cls._get_language_values("name", arg)
-        else:
-            return tuple()
 
     @classmethod
     def _validate_kwargs(cls, kwargs):
         params = set()
-        if all(isinstance(ka, str) for ka in kwargs.values()):
-            cls._assert_not_deprecated(kwargs.get("pt3"))
-            for tg, lg in kwargs.items():
-                if lg:
-                    params.add(cls._get_language_values(tg, lg))
-        else:
-            params.add(tuple())
+        cls._assert_not_deprecated(kwargs.get("pt3"))
+        for tg, lg in kwargs.items():
+            if lg:
+                params.add(cls._get_language_values(tg, lg))
 
         return params.pop() if len(params) == 1 else tuple()
 
