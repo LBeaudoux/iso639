@@ -2,7 +2,7 @@ from operator import itemgetter
 from typing import Union, List
 
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
-from .mapping import load_mapping
+from .datafile import load_mapping
 
 
 class Lang(tuple):
@@ -279,3 +279,12 @@ class Lang(tuple):
     @classmethod
     def _get_individuals(cls, pt3_value):
         return cls._macro["macro"].get(pt3_value, [])
+
+    @classmethod
+    def _reset(cls):
+        """Reload all mappings"""
+        cls._data = load_mapping("mapping_data")
+        cls._scope = load_mapping("mapping_scope")
+        cls._type = load_mapping("mapping_type")
+        cls._deprecated = load_mapping("mapping_deprecated")
+        cls._macro = load_mapping("mapping_macro")

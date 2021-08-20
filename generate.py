@@ -1,8 +1,10 @@
 import json
+import pickle
 import sqlite3
 from collections import namedtuple
 
-from iso639.mapping import get_file
+from iso639.datafile import get_file
+from iso639.iso639 import Lang
 
 Iso6392 = namedtuple(
     "Iso6392",
@@ -39,10 +41,7 @@ def load_iso6392(datafile: str, db: sqlite3.Connection):
         )
         for iso6392 in read_iso6392(datafile):
             db.execute(
-                """
-                INSERT INTO iso6392 (pt2b, name, pt2t, pt1) 
-                VALUES (?, ?, ?, ?)
-                """,
+                "INSERT INTO iso6392 VALUES (?, ?, ?, ?)",
                 (
                     iso6392.alpha3_bibliographic,
                     iso6392.English_name,
@@ -93,18 +92,7 @@ def load_iso6393(datafile: str, db: sqlite3.Connection):
         )
         for iso6393 in read_iso6393(datafile):
             db.execute(
-                """
-                INSERT INTO iso6393 (
-                    pt3, 
-                    name, 
-                    pt1, 
-                    pt2b, 
-                    pt2t, 
-                    scope, 
-                    type
-                ) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
+                "INSERT INTO iso6393 VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (
                     iso6393.Id,
                     iso6393.Ref_Name,
@@ -132,7 +120,7 @@ def read_iso6395(datafile: str) -> Iso6395:
 
 
 def load_iso6395(datafile: str, db: sqlite3.Connection):
-    """Load ISO 639-3 data into a database table"""
+    """Load ISO 639-5 data into a database table"""
     with db:
         db.execute(
             """
@@ -144,10 +132,7 @@ def load_iso6395(datafile: str, db: sqlite3.Connection):
         )
         for iso6395 in read_iso6395(datafile):
             db.execute(
-                """
-                INSERT INTO iso6395 (pt5, name) 
-                VALUES (?, ?)
-                """,
+                "INSERT INTO iso6395 (pt5, name) VALUES (?, ?)",
                 (iso6395.code, iso6395.Label_English),
             )
 
@@ -174,16 +159,7 @@ def build_iso639(db: sqlite3.Connection):
         )
         db.execute(
             """
-            INSERT INTO iso639 (
-                name, 
-                pt1, 
-                pt2b, 
-                pt2t, 
-                pt3, 
-                pt5,
-                scope, 
-                type
-            ) 
+            INSERT INTO iso639 
             SELECT 
                 iso6393.name, 
                 iso6393.pt1, 
@@ -198,16 +174,7 @@ def build_iso639(db: sqlite3.Connection):
         )
         db.execute(
             """
-            INSERT INTO iso639 (
-                name, 
-                pt1, 
-                pt2b, 
-                pt2t,
-                pt3,
-                pt5,
-                scope,
-                type
-            ) 
+            INSERT INTO iso639 
             SELECT 
                 iso6395.name, 
                 IFNULL(iso6392.pt1, ''), 
@@ -267,17 +234,7 @@ def load_retirements(datafile: str, db: sqlite3.Connection):
         )
         for ret in read_retirement(datafile):
             db.execute(
-                """
-                INSERT INTO temp_retirements (
-                    pt3, 
-                    name, 
-                    reason, 
-                    change_to, 
-                    ret_remedy, 
-                    effective
-                ) 
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
+                "INSERT INTO temp_retirements VALUES (?, ?, ?, ?, ?, ?)",
                 (
                     ret.Id,
                     ret.Ref_Name,
@@ -360,10 +317,7 @@ def load_macros(datafile: str, db: sqlite3.Connection):
         )
         for macro in read_macro(datafile):
             db.execute(
-                """
-                INSERT INTO temp_macros (macro, individual, individual_status) 
-                VALUES (?, ?, ?)
-                """,
+                "INSERT INTO temp_macros VALUES (?, ?, ?)",
                 (macro.M_Id, macro.I_Id, macro.I_Status),
             )
         db.execute(
@@ -374,7 +328,7 @@ def load_macros(datafile: str, db: sqlite3.Connection):
             )
             """
         )
-        # route deprecated individual lanuages
+        # route deprecated individual languages
         db.execute(
             """ 
             INSERT INTO macros
@@ -472,6 +426,25 @@ def serialize_macro(db: sqlite3.Connection, datafile: str):
         json.dump(mapping, f)
 
 
+def serialize_langs(db: sqlite3.Connection, datafile: str):
+    Lang._reset()
+    with db:
+        sql = """
+                SELECT iso639.name
+                FROM iso639
+                LEFT JOIN retirements
+                    ON iso639.pt3 = retirements.pt3
+                WHERE retirements.pt3 IS NULL
+                ORDER BY iso639.name
+                """
+        all_langs = []
+        for (name,) in db.execute(sql):
+            all_langs.append(Lang(name))
+
+    with open(datafile, "wb") as f:
+        pickle.dump(all_langs, f)
+
+
 if __name__ == "__main__":
 
     con = sqlite3.connect(":memory:")
@@ -502,5 +475,9 @@ if __name__ == "__main__":
     serialize_deprecated(con, mapping_deprecated_path)
     mapping_macro_path = get_file("mapping_macro")
     serialize_macro(con, mapping_macro_path)
+
+    # pickle the list of all possible Lang instances
+    langs_path = get_file("list_langs")
+    serialize_langs(con, langs_path)
 
     con.close()

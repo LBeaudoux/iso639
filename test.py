@@ -1,6 +1,5 @@
 import unittest
-
-from iso639 import Lang
+from iso639 import Lang, iter_langs
 from iso639.exceptions import InvalidLanguageValue, DeprecatedLanguageValue
 
 
@@ -294,6 +293,12 @@ class TestLang(unittest.TestCase):
                 else:
                     for ind in individuals:
                         self.assertEqual(ind.individuals(), [])
+
+    def test_iter_langs(self):
+        lg1 = next(iter_langs()).name
+        lgs = [lg.name for lg in iter_langs()]
+        self.assertEqual(lg1, lgs[0])
+        self.assertEqual(len(set(lgs)), len(lgs))
 
 
 if __name__ == "__main__":

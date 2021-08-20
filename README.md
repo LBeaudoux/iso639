@@ -120,6 +120,10 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 'Gascon replaced by Occitan (post 1500)'
 ```
 
+### Other functions
+
+`iter_langs()` iterates through all ISO 639 languages, in alphabetical order.
+
 ## Sources of data used by iso639-lang
 
 As of August 17, 2021, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
