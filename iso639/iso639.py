@@ -214,8 +214,8 @@ class Lang(tuple):
             return tuple(map(lambda x: getattr(arg, x), cls._tags))
         elif isinstance(arg, str):
             if len(arg) == 3 and arg.lower() == arg:
-                cls._assert_not_deprecated(arg)
                 for tg in ("pt3", "pt2b", "pt2t", "pt5"):
+                    cls._assert_not_deprecated(arg)
                     values = cls._get_language_values(tg, arg)
                     if values:
                         return values
@@ -226,8 +226,13 @@ class Lang(tuple):
 
     @classmethod
     def _validate_kwargs(cls, kwargs):
+        for tg in ("pt2b", "pt2t", "pt3", "pt5"):
+            try:
+                cls._assert_not_deprecated(kwargs[tg])
+            except KeyError:
+                pass
+
         params = set()
-        cls._assert_not_deprecated(kwargs.get("pt3"))
         for tg, lg in kwargs.items():
             if lg:
                 params.add(cls._get_language_values(tg, lg))
