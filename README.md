@@ -53,20 +53,6 @@ Begin by importing the `Lang` class:
 ''
 ```
 
-An instance of `Lang` can be modified.
-```python
->>> lg.pt1 = 'de'
->>> lg.name
-'German'
-```
-
-`Lang` instances are comparable to each other.
-```python
->>> other_lg = Lang("deu")
->>> lg == other_lg
-True
-```
-
 You can easily get the macrolanguage of an individual language.
 ```python
 >>> lg = Lang("Wu Chinese")
