@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="iso639-lang",
-    version="1.0.0",
+    version="2.0.0",
     author="L.Beaudoux",
     description="A lightweight library for the ISO 639 standard.",
     long_description=long_description,
@@ -22,5 +22,5 @@ setuptools.setup(
         "Development Status :: 5 - Production/Stable",
     ],
     python_requires=">=3.6",
-    package_data={"iso639": ["data/*.json"]},
+    package_data={"iso639": ["data/*.json", "data/*.pkl"]},
 )
