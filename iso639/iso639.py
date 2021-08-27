@@ -1,8 +1,8 @@
 from operator import itemgetter
-from typing import Union, List
+from typing import List, Union
 
-from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
 from .datafile import load_mapping
+from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
 
 
 class Lang(tuple):

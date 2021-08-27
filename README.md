@@ -122,7 +122,13 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 
 ### Other functions
 
-`iter_langs()` iterates through all ISO 639 languages, in alphabetical order.
+`iter_langs()` iterates through all possible Lang instances, ordered alphabetically by name.
+
+```python
+>>> from iso639 import iter_langs
+>>> [lg.name for lg in iter_langs()]
+["'Are'are", "'Auhelawa", "A'ou", 'A-Pucikwar', 'Aari', ... , 'ǁGana', 'ǁXegwi', 'ǂHua', 'ǂUngkue', 'ǃXóõ']
+```
 
 ## Sources of data used by iso639-lang
 
