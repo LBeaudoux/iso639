@@ -4,5 +4,5 @@ env_iso639/
 build/
 dist/
 iso639_lang.egg-info/
-.vscode
-how_to_upload_to_PyPI.txt
+.vscode/
+*.ipynb

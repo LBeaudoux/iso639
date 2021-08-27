@@ -11,8 +11,12 @@ class InvalidLanguageValue(Exception):
 
     def __init__(self, *args, **kwargs):
 
-        arg_str = ", ".join(list(args) + ["=".join(x) for x in kwargs.items()])
-        self.msg = f"'{arg_str}' not supported by ISO 639"
+        pt_msg = (
+            "(*{0}, **{1}). "
+            "Only valid ISO 639 language values are supported as arguments."
+        )
+
+        self.msg = pt_msg.format(args, kwargs)
 
         super().__init__(self.msg)
 
@@ -31,7 +35,7 @@ class DeprecatedLanguageValue(Exception):
             "S": "split",
             "M": "merge",
         }
-        reason = reasons.get(kwargs.get("ret_reason"))
+        reason = reasons.get(kwargs.get("reason"))
         if kwargs.get("ret_remedy"):
             remedy = "{ret_remedy}.".format(**kwargs)
         elif kwargs.get("change_to"):
@@ -39,14 +43,14 @@ class DeprecatedLanguageValue(Exception):
         else:
             remedy = ""
         pt = (
-            "As of {effective}, [{id}] for {ref_name} is deprecated "
+            "As of {effective}, [{id}] for {name} is deprecated "
             "due to {0}. {1}"
         )
 
         self.msg = pt.format(reason, remedy, **kwargs)
-        self.name = kwargs.get("ref_name", "")
+        self.name = kwargs.get("name", "")
         self.change_to = kwargs.get("change_to", "")
-        self.ret_remedy = kwargs.get("ret_remedy", "")
+        self.ret_remedy = kwargs.get("remedy", "")
         self.effective = kwargs.get("effective", "")
 
         super().__init__(self.msg)
