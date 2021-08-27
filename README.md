@@ -52,7 +52,6 @@ Begin by importing the `Lang` class:
 >>> lg.pt5
 ''
 ```
-
 `Lang` instances are sortable by name and hashable.
 ```python
 >>> langs = [Lang("deu"), Lang("eng"), Lang("rus"), Lang("eng")]
