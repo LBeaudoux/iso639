@@ -52,13 +52,27 @@ Begin by importing the `Lang` class:
 >>> lg.pt5
 ''
 ```
-`Lang` instances are sortable by name and hashable.
+### In data structures
+Lists of `Lang` instances are sortable by name. 
 ```python
 >>> langs = [Lang("deu"), Lang("eng"), Lang("rus"), Lang("eng")]
 >>> [lg.name for lg in sorted(langs)]
 ['English', 'English', 'German', 'Russian']
+```
+As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
+```python
 >>> [lg.pt3 for lg in set(langs)]
 ['eng', 'rus', 'deu']
+```
+
+### Iterator
+
+`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
+
+```python
+>>> from iso639 import iter_langs
+>>> [lg.name for lg in iter_langs()]
+["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
 ```
 
 ### Language Types
@@ -117,16 +131,6 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 ...     f"{e.name} replaced by {lg.name}"
 ...
 'Gascon replaced by Occitan (post 1500)'
-```
-
-### Iterator
-
-`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
-
-```python
->>> from iso639 import iter_langs
->>> [lg.name for lg in iter_langs()]
-["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
 ```
 
 ## Sources of data used by iso639-lang
