@@ -135,7 +135,7 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 
 ## Sources of data used by iso639-lang
 
-As of August 17, 2021, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
+As of March 7, 2022, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
  
  
 | Standard  | Name                                                                                       | Registration Authority |
