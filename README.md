@@ -2,8 +2,8 @@
 # iso639-lang
 
 ![PyPI](https://img.shields.io/pypi/v/iso639-lang)
+![Supported Python versions](https://img.shields.io/pypi/pyversions/iso639-lang.svg)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/iso639-lang)
-
   
 **iso639-lang** is a simple library to handle the ISO 639 series of international standards for language codes.
 
