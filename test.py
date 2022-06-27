@@ -101,6 +101,20 @@ class TestLang(unittest.TestCase):
         with self.assertRaises(InvalidLanguageValue):
             Lang("GERMAN")
 
+    def test_asdict(self):
+        lg = Lang("fra")
+        self.assertEqual(
+            lg.asdict(),
+            {
+                "name": "French",
+                "pt1": "fr",
+                "pt2b": "fre",
+                "pt2t": "fra",
+                "pt3": "fra",
+                "pt5": "",
+            },
+        )
+
     def test_equal_languages(self):
         lg1 = Lang("eng")
         lg2 = Lang("en")

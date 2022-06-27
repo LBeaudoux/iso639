@@ -52,6 +52,13 @@ Begin by importing the `Lang` class:
 >>> lg.pt5
 ''
 ```
+
+You can use the `asdict` method to return ISO 639 language values as a Python dictionary.
+```python
+>>> lg.asdict()
+{'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
+```
+
 ### In data structures
 Lists of `Lang` instances are sortable by name. 
 ```python

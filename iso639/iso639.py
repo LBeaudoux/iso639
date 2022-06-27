@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import List, Union
+from typing import Dict, List, Union
 
 from .datafile import load_mapping
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
@@ -140,6 +140,19 @@ class Lang(tuple):
     def pt5(self) -> str:
         """Gets the ISO 639-5 code of this language"""
         return tuple.__getitem__(self, 5)
+
+    def asdict(self) -> Dict[str, str]:
+        """Get ISO 639 language name and codes as a Python
+        dictionary.
+
+        Returns
+        -------
+        Dict[str, str]
+            A dictionary containing the values of the 'name',
+            'pt1', 'pt2b', 'pt2t', 'pt3' and 'pt5' attibutes.
+        """
+
+        return {tg: getattr(self, tg) for tg in self._tags}
 
     def scope(self) -> str:
         """Gets the ISO 639-3 scope of this language
