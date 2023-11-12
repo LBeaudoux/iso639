@@ -113,7 +113,7 @@ mol	Moldavian	M	ron		2008-11-03
 aay	Aariya	N			2009-01-16
 acc	Cubulco Achí	M	acr		2009-01-16
 cbm	Yepocapa Southwestern Cakchiquel	M	cak		2009-01-16
-chs	Chumash				2009-01-16
+chs	Chumash	N			2009-01-16
 ckc	Northern Cakchiquel	M	cak		2009-01-16
 ckd	South Central Cakchiquel	M	cak		2009-01-16
 cke	Eastern Cakchiquel	M	cak		2009-01-16
@@ -369,5 +369,19 @@ pii	Pini	N			2022-01-20
 smd	Sama	M	kmb		2022-01-20
 snb	Sebuyau	M	iba		2022-01-20
 uun	Kulon-Pazeh	S		Split into Kulon [uon] and Pazeh [pzh]	2022-01-20
-wrd	Warduji				2022-01-20
+wrd	Warduji	N			2022-01-20
 wya	Wyandot	S		Split into Wyandot [wyn] and Wendat [wdt]	2022-01-20
+ajp	South Levantine Arabic	M	apc		2023-01-20
+kgm	Karipúna	D	plu		2023-01-20
+ksa	Shuwa-Zamani	S		Split into [rsw] Rishiwa and [izm] Kizamani	2023-01-20
+nom	Nocamán	M	cbr		2023-01-20
+plj	Polci	S		Split into Pesse [pze], Dir-Nyamzak-Mbarimi [nzr], Zul [zlu], and Buli [uly]	2023-01-20
+pmk	Pamlico	M	crr		2023-01-20
+prp	Parsi	M	guj		2023-01-20
+slq	Salchuq	N			2023-01-20
+szd	Seru	M	umi		2023-01-20
+tmk	Northwestern Tamang	M	tdg		2023-01-20
+tpw	Tupí	D	tpn		2023-01-20
+xss	Assan	M	zko		2023-01-20
+zkb	Koibal	D	kjh		2023-01-20
+zua	Zeem	S		Split into [tvi] Tulai, [dyr] Dyarim, [dsk] Dokshi, [cxh] Cha'ari, and [zem] Zeem	2023-01-20
