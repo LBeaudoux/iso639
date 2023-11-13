@@ -24,4 +24,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     package_data={"iso639": ["data/*.json", "data/*.pkl"]},
+    install_requires=[
+        "importlib-resources>=6.1;python_version<'3.9'",
+    ]
 )
