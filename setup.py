@@ -13,18 +13,19 @@ setuptools.setup(
     url="https://github.com/LBeaudoux/iso639",
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 5 - Production/Stable",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     package_data={"iso639": ["data/*.json", "data/*.pkl"]},
     install_requires=[
-        "importlib-resources>=6.1;python_version<'3.9'",
-    ]
+        "importlib-resources==5.12.0;python_version<'3.9'",
+    ],
 )
