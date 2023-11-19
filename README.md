@@ -25,7 +25,7 @@ iso639-lang is available on PyPI:
 ```console
 $ pip install iso639-lang
 ```
-iso639-lang supports Python 3.6+.  
+iso639-lang supports Python 3.7+.  
   
 ## Usage
 
