@@ -99,11 +99,11 @@ class Lang(tuple):
         return hash(repr(self))
 
     def __eq__(self, other):
-        return type(other) == type(self) and hash(other) == hash(self)
+        return type(other) is type(self) and hash(other) == hash(self)
 
     def __lt__(self, other):
         return (
-            type(other) == type(self) and other.name and self.name < other.name
+            type(other) is type(self) and other.name and self.name < other.name
         )
 
     def __getnewargs__(self):
