@@ -3,11 +3,9 @@ import pickle
 
 try:
     from importlib.resources import files
-    from importlib.abc import Traversable
 except ImportError:
     # Compatibility for Python <3.9
     from importlib_resources import files
-    from importlib_resources.abc import Traversable
 
 
 FILENAMES = {
@@ -25,7 +23,7 @@ FILENAMES = {
 }
 
 
-def get_file(file_alias: str) -> Traversable:
+def get_file(file_alias: str):
     """Get the path of a local data file"""
     return files(__package__).joinpath(FILENAMES[file_alias])
 
