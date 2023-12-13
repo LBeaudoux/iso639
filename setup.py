@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="iso639-lang",
-    version="2.2.1",
+    version="2.2.2",
     author="L.Beaudoux",
     description="A lightweight library for the ISO 639 standard.",
     long_description=long_description,
