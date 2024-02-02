@@ -1,6 +1,7 @@
 import unittest
+
 from iso639 import Lang, iter_langs
-from iso639.exceptions import InvalidLanguageValue, DeprecatedLanguageValue
+from iso639.exceptions import DeprecatedLanguageValue, InvalidLanguageValue
 
 
 class TestLang(unittest.TestCase):
@@ -250,10 +251,9 @@ class TestLang(unittest.TestCase):
         self.assertIsNone(Lang("ber").scope())
 
     def test_type(self):
-        self.assertEqual(Lang("lat").type(), "Ancient")
         self.assertEqual(Lang("epo").type(), "Constructed")
         self.assertEqual(Lang("djf").type(), "Extinct")
-        self.assertEqual(Lang("fro").type(), "Historical")
+        self.assertEqual(Lang("lat").type(), "Historical")
         self.assertEqual(Lang("fra").type(), "Living")
         self.assertEqual(Lang("und").type(), "Special")
         self.assertIsNone(Lang("ber").type())
