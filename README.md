@@ -88,7 +88,7 @@ The type of a language is accessible thanks to the `type` method.
 ```python
 >>> lg = Lang("Latin")
 >>> lg.type()
-'Ancient'
+'Historical'
 ```
 
 ### Macrolanguages
@@ -142,7 +142,7 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 
 ## Sources of data used by iso639-lang
 
-As of November 12, 2023, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
+As of February 2, 2024, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
  
  
 | Standard  | Name                                                                                       | Registration Authority |
