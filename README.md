@@ -39,17 +39,17 @@ Begin by importing the `Lang` class:
 `Lang` is instantiable with any ISO 639 language code or name. For example, let’s try to get the ISO 639 codes for French:
 ```python
 >>> lg = Lang("French")
->>> lg.name
+>>> lg.name # English name
 'French'
->>> lg.pt1
+>>> lg.pt1 # Part 1 code
 'fr'
->>> lg.pt2b
+>>> lg.pt2b # Part 2 bibliographic code
 'fre'
->>> lg.pt2t
+>>> lg.pt2t # Part 2 terminological code
 'fra'
->>> lg.pt3
+>>> lg.pt3 # Part 3 code
 'fra'
->>> lg.pt5
+>>> lg.pt5 # Part 5 code
 ''
 ```
 
