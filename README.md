@@ -53,9 +53,17 @@ Begin by importing the `Lang` class:
 ''
 ```
 
+Please not that `Lang` is case-sensitive:
+```python
+>>> Lang("ak")
+Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
+>>> Lang("Ak")
+Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
+```
+
 You can use the `asdict` method to return ISO 639 language values as a Python dictionary.
 ```python
->>> lg.asdict()
+>>> Lang("fra").asdict()
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
