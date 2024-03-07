@@ -53,7 +53,7 @@ Begin by importing the `Lang` class:
 ''
 ```
 
-Please not that `Lang` is case-sensitive:
+Please note that `Lang` is case-sensitive:
 ```python
 >>> Lang("ak")
 Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
