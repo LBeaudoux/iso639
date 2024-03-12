@@ -3,8 +3,6 @@ from typing import Iterator
 from .datafile import load_langs
 from .iso639 import Lang
 
-Lang = Lang
-
 
 def iter_langs() -> Iterator[Lang]:
     """Iterate through all not deprecated ISO 639 languages
@@ -17,3 +15,8 @@ def iter_langs() -> Iterator[Lang]:
     sorted_langs = load_langs()
 
     return iter(sorted_langs)
+
+__all__ = [
+    "Lang",
+    "iter_langs",
+]
