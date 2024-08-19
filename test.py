@@ -263,9 +263,9 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.macro().pt3, "zho")
 
     def test_individuals(self):
-        lg = Lang("fas")
-        ind_lgs = {x.pt3 for x in lg.individuals()}
-        self.assertIn("pes", ind_lgs)
+        individuals_pt3 = [x.pt3 for x in Lang("ara").individuals()]
+        self.assertIn("apc", individuals_pt3)
+        self.assertEqual(len(individuals_pt3), len(set(individuals_pt3)))
 
     def test_deprecated_arg(self):
         for pt3 in self.lang_vals["deprecated"]:

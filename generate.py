@@ -333,7 +333,7 @@ def load_macros(datafile: str, db: sqlite3.Connection):
         db.execute(
             """ 
             INSERT INTO macros
-            SELECT
+            SELECT DISTINCT
                 CASE 
                     WHEN r1.change_to IS NULL OR r1.change_to = '' 
                         THEN m.macro
