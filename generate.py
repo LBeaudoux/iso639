@@ -2,6 +2,7 @@ import json
 import pickle
 import sqlite3
 from collections import namedtuple
+from typing import Generator
 
 from iso639.datafile import get_file
 from iso639.iso639 import Lang
@@ -18,7 +19,7 @@ Iso6392 = namedtuple(
 )
 
 
-def read_iso6392(datafile: str) -> Iso6392:
+def read_iso6392(datafile: str) -> Generator[Iso6392, None, None]:
     """Read ISO 639-2 data from its source file"""
     with open(datafile, encoding="utf-8-sig") as f:
         for line in f:
@@ -65,7 +66,7 @@ Iso6393 = namedtuple(
 )
 
 
-def read_iso6393(datafile: str) -> Iso6393:
+def read_iso6393(datafile: str) -> Generator[Iso6393, None, None]:
     """Read ISO 639-3 data from its source file"""
     with open(datafile, encoding="utf-8") as f:
         next(f)
@@ -110,7 +111,7 @@ Iso6395 = namedtuple(
 )
 
 
-def read_iso6395(datafile: str) -> Iso6395:
+def read_iso6395(datafile: str) -> Generator[Iso6395, None, None]:
     """Read ISO 639-5 data from its source file"""
     with open(datafile, encoding="utf-8") as f:
         next(f)
@@ -208,7 +209,7 @@ Retirement = namedtuple(
 )
 
 
-def read_retirement(datafile: str) -> Retirement:
+def read_retirement(datafile: str) -> Generator[Retirement, None, None]:
     """Read ISO 639-3 retirement data from its source file"""
     with open(datafile, encoding="utf-8") as f:
         next(f)
@@ -293,7 +294,7 @@ def filter_retirements(db: sqlite3.Connection):
 MacroLanguage = namedtuple("Macro", ["M_Id", "I_Id", "I_Status"])
 
 
-def read_macro(datafile: str) -> MacroLanguage:
+def read_macro(datafile: str) -> Generator[MacroLanguage, None, None]:
     """Read ISO 639-3 macrolanguage data from its source file"""
     with open(datafile, encoding="utf-8") as f:
         next(f)

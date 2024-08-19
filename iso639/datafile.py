@@ -1,5 +1,6 @@
 import json
 import pickle
+from typing import Dict, List
 
 try:
     from importlib.resources import files
@@ -28,7 +29,7 @@ def get_file(file_alias: str):
     return files(__package__).joinpath(FILENAMES[file_alias])
 
 
-def load_mapping(file_alias: str) -> dict:
+def load_mapping(file_alias: str) -> Dict:
     """Load an ISO 639 mapping JSON file"""
     file_path = get_file(file_alias)
     try:
@@ -38,7 +39,7 @@ def load_mapping(file_alias: str) -> dict:
         return {}
 
 
-def load_langs() -> list:
+def load_langs() -> List:
     """Load the pickled list of ISO 639 Langs"""
     file_path = get_file("list_langs")
     try:
