@@ -1,7 +1,7 @@
 import json
 import pickle
 import sqlite3
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from typing import Generator
 
 from iso639.datafile import get_file
@@ -30,9 +30,10 @@ def read_iso6392(datafile: str) -> Generator[Iso6392, None, None]:
 def load_iso6392(datafile: str, db: sqlite3.Connection):
     """Load ISO 639-2 data into a database table"""
     with db:
+        db.execute("DROP TABLE IF EXISTS iso6392")
         db.execute(
             """
-            CREATE TEMPORARY TABLE iso6392 (
+            CREATE TABLE iso6392 (
                 pt2b CHAR(3) PRIMARY KEY,
                 name TEXT NOT NULL,
                 pt2t CHAR(3) NULL,
@@ -365,6 +366,38 @@ def load_macros(datafile: str, db: sqlite3.Connection):
         )
 
 
+Name = namedtuple("Name", ["Id", "Print_Name", "Inverted_Name"])
+
+
+def read_name(datafile: str) -> Generator[Name, None, None]:
+    """Read ISO 639-3 name data from its source file"""
+    with open(datafile, encoding="utf-8") as f:
+        next(f)
+        for line in f:
+            row = line.rstrip().split("\t")
+            yield Name(*row)
+
+
+def load_names(datafile: str, db: sqlite3.Connection):
+    """Load ISO 639-3 name data into a database table"""
+    with db:
+        db.execute("DROP TABLE IF EXISTS names")
+        db.execute(
+            """
+            CREATE TABLE names (
+                pt3 CHAR(3) NOT NULL,
+                print_name TEXT NOT NULL,
+                inverted_name TEXT NOT NULL
+            )
+            """
+        )
+        for name in read_name(datafile):
+            db.execute(
+                "INSERT INTO names VALUES (?, ?, ?)",
+                (name.Id, name.Print_Name, name.Inverted_Name),
+            )
+
+
 def serialize_iso639(db: sqlite3.Connection, datafile: str):
     with db:
         mapping = {}
@@ -427,6 +460,93 @@ def serialize_macro(db: sqlite3.Connection, datafile: str):
         json.dump(mapping, f)
 
 
+def serialize_ref_name(db: sqlite3.Connection, datafile: str):
+    with db:
+        sql = """
+                SELECT 
+                    names.print_name AS other_name,
+                    iso639.name AS ref_name
+                FROM names
+                INNER JOIN iso639 ON names.pt3 = iso639.pt3
+                    WHERE other_name != ref_name
+                UNION
+                SELECT 
+                    names.inverted_name AS other_name,
+                    iso639.name AS ref_name
+                FROM names
+                INNER JOIN iso639 ON names.pt3 = iso639.pt3
+                    WHERE other_name != ref_name
+                UNION
+                SELECT 
+                    iso6392.name AS other_name,
+                    iso639.name AS ref_name
+                FROM iso6392
+                INNER JOIN iso639 ON iso6392.pt2B = iso639.pt2B
+                    WHERE other_name != ref_name
+                ORDER BY ref_name
+                """
+        ref_names = defaultdict(set)
+        for joined_names, ref_name in db.execute(sql):
+            for other_name in joined_names.split("; "):
+                if other_name != ref_name:
+                    ref_names[other_name].add(ref_name)
+
+    mapping = {
+        other_name: v.pop()
+        for other_name, v in sorted(ref_names.items())
+        if len(v) == 1
+    }
+    assert len(ref_names) == len(mapping)
+
+    with open(datafile, "w", encoding="utf-8") as f:
+        json.dump(mapping, f)
+
+
+def serialize_other_names(db: sqlite3.Connection, datafile: str):
+    with db:
+        sql = """
+                WITH other_names AS (
+                    SELECT 
+                        iso639.name AS ref_name,
+                        names.print_name AS other_name
+                    FROM names
+                    INNER JOIN iso639 ON names.pt3 = iso639.pt3
+                        WHERE other_name != ref_name
+                    UNION
+                    SELECT 
+                        iso639.name AS ref_name,
+                        names.inverted_name AS other_name
+                    FROM names
+                    INNER JOIN iso639 ON names.pt3 = iso639.pt3
+                        WHERE other_name != ref_name
+                    UNION
+                    SELECT 
+                        iso639.name AS ref_name,
+                        iso6392.name AS other_name
+                    FROM iso6392
+                    INNER JOIN iso639 ON iso6392.pt2B = iso639.pt2B
+                        WHERE other_name != ref_name
+                )
+                SELECT ref_name, group_concat(other_name, "; ")
+                FROM other_names
+                GROUP BY ref_name
+                ORDER BY ref_name ASC
+                """
+        other_names = defaultdict(set)
+        for ref_name, joined_names in db.execute(sql):
+            for other_name in joined_names.split("; "):
+                if other_name != ref_name:
+                    other_names[ref_name].add(other_name)
+
+    mapping = {
+        ref_name: sorted(list(other_names))
+        for ref_name, other_names in other_names.items()
+    }
+
+    with open(datafile, "w", encoding="utf-8") as f:
+        json.dump(mapping, f)
+
+
 def serialize_langs(db: sqlite3.Connection, datafile: str):
     Lang._reset()
     with db:
@@ -464,6 +584,8 @@ if __name__ == "__main__":
     filter_retirements(con)
     macros_path = get_file("macros")
     load_macros(macros_path, con)
+    names_path = get_file("names")
+    load_names(names_path, con)
 
     # export mapping results as JSON files
     mapping_data_path = get_file("mapping_data")
@@ -476,6 +598,10 @@ if __name__ == "__main__":
     serialize_deprecated(con, mapping_deprecated_path)
     mapping_macro_path = get_file("mapping_macro")
     serialize_macro(con, mapping_macro_path)
+    mapping_ref_name_path = get_file("mapping_ref_name")
+    serialize_ref_name(con, mapping_ref_name_path)
+    mapping_other_names_path = get_file("mapping_other_names")
+    serialize_other_names(con, mapping_other_names_path)
 
     # pickle the list of all possible Lang instances
     langs_path = get_file("list_langs")

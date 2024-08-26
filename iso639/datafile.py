@@ -15,11 +15,14 @@ FILENAMES = {
     "pt5": "data/iso639-5.tsv",
     "retirements": "data/iso-639-3_Retirements.tab",
     "macros": "data/iso-639-3-macrolanguages.tab",
+    "names": "data/iso-639-3_Name_Index.tab",
     "mapping_data": "data/iso-639.json",
     "mapping_scope": "data/iso-639_scope.json",
     "mapping_type": "data/iso-639_type.json",
     "mapping_deprecated": "data/iso-639_deprecated.json",
     "mapping_macro": "data/iso-639_macro.json",
+    "mapping_ref_name": "data/iso-639_ref_name.json",
+    "mapping_other_names": "data/iso-639_other_names.json",
     "list_langs": "data/iso-639_langs.pkl",
 }
 

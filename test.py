@@ -94,6 +94,17 @@ class TestLang(unittest.TestCase):
         self.assertEqual(lg.pt5, "")
         self.assertEqual(lg.name, "German")
 
+    def test_other_name(self):
+        # pt3 printed name
+        self.assertEqual(Lang("uig"), Lang("Uyghur"))
+        self.assertEqual(Lang("Uighur"), Lang("Uyghur"))
+        # pt3 inverted name
+        self.assertEqual(Lang("cmn"), Lang("Chinese, Mandarin"))
+        self.assertEqual(Lang("Mandarin Chinese"), Lang("Chinese, Mandarin"))
+        # pt2b English name
+        self.assertEqual(Lang("ast"), Lang("Bable"))
+        self.assertEqual(Lang("Asturian"), Lang("Bable"))
+
     def test_lower_name(self):
         with self.assertRaises(InvalidLanguageValue):
             Lang("german")
@@ -266,6 +277,22 @@ class TestLang(unittest.TestCase):
         individuals_pt3 = [x.pt3 for x in Lang("ara").individuals()]
         self.assertIn("apc", individuals_pt3)
         self.assertEqual(len(individuals_pt3), len(set(individuals_pt3)))
+
+    def test_other_names(self):
+        # pt3 printed name
+        lg = Lang("Uighur")
+        self.assertAlmostEqual(lg.other_names(), ["Uyghur"])
+        # pt3 inverted name
+        lg = Lang("cmn")
+        self.assertAlmostEqual(lg.other_names(), ["Chinese, Mandarin"])
+        # pt2b English names
+        lg = Lang("ast")
+        self.assertAlmostEqual(
+            lg.other_names(), ["Asturleonese", "Bable", "Leonese"]
+        )
+        # no other name
+        lg = Lang("fra")
+        self.assertAlmostEqual(lg.other_names(), [])
 
     def test_deprecated_arg(self):
         for pt3 in self.lang_vals["deprecated"]:

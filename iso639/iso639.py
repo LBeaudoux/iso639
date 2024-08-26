@@ -57,6 +57,8 @@ class Lang(tuple):
     _type = load_mapping("mapping_type")
     _deprecated = load_mapping("mapping_deprecated")
     _macro = load_mapping("mapping_macro")
+    _ref_name = load_mapping("mapping_ref_name")
+    _other_names = load_mapping("mapping_other_names")
 
     __slots__ = ()  # set immutability of Lang
 
@@ -221,6 +223,19 @@ class Lang(tuple):
 
         return individuals
 
+    def other_names(self) -> List[str]:
+        """Get all the names of this language that are not its
+        reference name
+
+        Returns
+        -------
+        list of str
+            the possible other ISO 639-3 printed names or
+            ISO 639-3 inverted names or ISO 639-2 English names of
+            this language, in alphabetical order.
+        """
+        return self._get_other_names(self.name)
+
     @classmethod
     def _validate_arg(cls, arg):
         if isinstance(arg, Lang):
@@ -263,12 +278,17 @@ class Lang(tuple):
 
     @classmethod
     def _get_language_values(cls, tag, language_value):
+        if tag == "name":
+            ref_value = cls._ref_name.get(language_value, language_value)
+        else:
+            ref_value = language_value
+
         try:
-            language_dict = cls._data[tag][language_value]
+            language_dict = cls._data[tag][ref_value]
         except KeyError:
             language_tuple = tuple()
         else:
-            language_dict[tag] = language_value
+            language_dict[tag] = ref_value
             language_tuple = itemgetter(*cls._tags)(language_dict)
 
         return language_tuple
@@ -292,6 +312,10 @@ class Lang(tuple):
     @classmethod
     def _get_individuals(cls, pt3_value):
         return cls._macro["macro"].get(pt3_value, [])
+
+    @classmethod
+    def _get_other_names(cls, ref_name_value):
+        return cls._other_names.get(ref_name_value, [])
 
     @classmethod
     def _reset(cls):

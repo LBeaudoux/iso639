@@ -61,7 +61,16 @@ Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
 Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
 ```
 
-You can use the `asdict` method to return ISO 639 language values as a Python dictionary.
+`Lang` recognizes all English names that can be associated with a language identifier according to ISO 639.
+```python
+>>> Lang("Chinese, Mandarin") # ISO 639-3 inverted name
+Lang(name='Mandarin Chinese', pt1='', pt2b='', pt2t='', pt3='cmn', pt5='')
+>>> Lang("Uyghur") # other ISO 639-3 printed name
+Lang(name='Uighur', pt1='ug', pt2b='uig', pt2t='uig', pt3='uig', pt5='')
+>>> Lang("Valencian") # other ISO 639-2 English name
+Lang(name='Catalan', pt1='ca', pt2b='cat', pt2t='cat', pt3='cat', pt5='')
+```
+
 ```python
 >>> Lang("fra").asdict()
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
@@ -121,6 +130,17 @@ Conversely, you can also list all the individual languages that share a common m
 >>> lg.individuals()
 [Lang(name='Iranian Persian', pt1='', pt2b='', pt2t='', pt3='pes', pt5=''), 
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
+```
+
+### Other Language Names
+
+In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
+```python
+>>> lg = Lang("ast")
+>>> lg.name
+'Asturian'
+>>> lg.other_names()
+['Asturleonese', 'Bable', 'Leonese']
 ```
 
 ### Exceptions
