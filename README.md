@@ -53,10 +53,20 @@ And now with the identifier of a group of languages.
 'cel'
 ```
 
-`Lang` is instantiable with any ISO 639 identifier or name.
+`Lang` is instantiable with any ISO 639 identifier or reference name.
 ```python
 >>> Lang("German") == Lang("de") == Lang("deu") == Lang("ger")
 True
+```
+
+`Lang` also recognizes all non-reference English names associated with a language identifier in ISO 639.
+```python
+>>> Lang("Chinese, Mandarin") # 639-3 inverted name
+Lang(name='Mandarin Chinese', pt1='', pt2b='', pt2t='', pt3='cmn', pt5='')
+>>> Lang("Uyghur") # other 639-3 printed name
+Lang(name='Uighur', pt1='ug', pt2b='uig', pt2t='uig', pt3='uig', pt5='')
+>>> Lang("Valencian") # other 639-2 English name
+Lang(name='Catalan', pt1='ca', pt2b='cat', pt2t='cat', pt3='cat', pt5='')
 ```
 
 Please note that `Lang` is case-sensitive.
@@ -65,16 +75,6 @@ Please note that `Lang` is case-sensitive.
 Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
 >>> Lang("Ak")
 Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
-```
-
-`Lang` recognizes all English names that can be associated with a language identifier according to ISO 639.
-```python
->>> Lang("Chinese, Mandarin") # ISO 639-3 inverted name
-Lang(name='Mandarin Chinese', pt1='', pt2b='', pt2t='', pt3='cmn', pt5='')
->>> Lang("Uyghur") # other ISO 639-3 printed name
-Lang(name='Uighur', pt1='ug', pt2b='uig', pt2t='uig', pt3='uig', pt5='')
->>> Lang("Valencian") # other ISO 639-2 English name
-Lang(name='Catalan', pt1='ca', pt2b='cat', pt2t='cat', pt3='cat', pt5='')
 ```
 
 You can use the `asdict` method to return ISO 639 values as a Python dictionary.
