@@ -5,55 +5,61 @@
 ![Supported Python versions](https://img.shields.io/pypi/pyversions/iso639-lang.svg)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/iso639-lang)
   
-**iso639-lang** is a simple library to handle the ISO 639 series of international standards for language codes.
+`iso639-lang` handles the ISO 639 code for individual languages and language groups.
 
 ```python
 >>> from iso639 import Lang
->>> Lang("fr")
+>>> Lang("French")
 Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5='')
 ```
 
-iso639-lang allows you to switch from one language code to another easily. 
-There’s no need to manually download or parse data files, just use the `Lang` class!
-
-ISO 639-1, ISO 639-2, ISO 639-3 and ISO 639-5 parts are all supported.
-
-## Installing iso639-lang and Supported Versions
-
-iso639-lang is available on PyPI:
+## Installation
 
 ```console
 $ pip install iso639-lang
 ```
-iso639-lang supports Python 3.7+.  
+`iso639-lang` supports Python 3.7+.  
   
 ## Usage
 
-Handling language codes with iso639-lang is very simple.
-
-Begin by importing the `Lang` class:
+Begin by importing the `Lang` class.
 ```python
 >>> from iso639 import Lang
 ```
 
-`Lang` is instantiable with any ISO 639 language code or name. For example, let’s try to get the ISO 639 codes for French:
+Let's try with the identifier of an individual language.
 ```python
->>> lg = Lang("French")
->>> lg.name # English name
-'French'
->>> lg.pt1 # Part 1 code
-'fr'
->>> lg.pt2b # Part 2 bibliographic code
-'fre'
->>> lg.pt2t # Part 2 terminological code
-'fra'
->>> lg.pt3 # Part 3 code
-'fra'
->>> lg.pt5 # Part 5 code
-''
+>>> lg = Lang("deu")
+>>> lg.name # 639-3 reference name
+'German'
+>>> lg.pt1 # 639-1 identifier
+'de'
+>>> lg.pt2b # 639-2 bibliographic identifier
+'ger'
+>>> lg.pt2t # 639-2 terminological identifier
+'deu'
+>>> lg.pt3 # 639-3 identifier
+'deu'
 ```
 
-Please note that `Lang` is case-sensitive:
+And now with the identifier of a group of languages.
+```python
+>>> lg = Lang("cel")
+>>> lg.name # 639-5 English name
+'Celtic languages'
+>>> lg.pt2b # 639-2 bibliographic identifier
+'cel'
+>>> lg.pt5 # 639-5 identifier
+'cel'
+```
+
+`Lang` is instantiable with any ISO 639 identifier or name.
+```python
+>>> Lang("German") == Lang("de") == Lang("deu") == Lang("ger")
+True
+```
+
+Please note that `Lang` is case-sensitive.
 ```python
 >>> Lang("ak")
 Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
@@ -61,32 +67,33 @@ Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
 Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
 ```
 
-`Lang` recognizes all English names that can be associated with a language identifier according to ISO 639.
+`Lang` recognizes all English names that can be associated with a language identifier according to ISO 639.
 ```python
->>> Lang("Chinese, Mandarin") # ISO 639-3 inverted name
+>>> Lang("Chinese, Mandarin") # ISO 639-3 inverted name
 Lang(name='Mandarin Chinese', pt1='', pt2b='', pt2t='', pt3='cmn', pt5='')
->>> Lang("Uyghur") # other ISO 639-3 printed name
+>>> Lang("Uyghur") # other ISO 639-3 printed name
 Lang(name='Uighur', pt1='ug', pt2b='uig', pt2t='uig', pt3='uig', pt5='')
->>> Lang("Valencian") # other ISO 639-2 English name
+>>> Lang("Valencian") # other ISO 639-2 English name
 Lang(name='Catalan', pt1='ca', pt2b='cat', pt2t='cat', pt3='cat', pt5='')
 ```
 
+You can use the `asdict` method to return ISO 639 values as a Python dictionary.
 ```python
 >>> Lang("fra").asdict()
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
 ### In data structures
+
 Lists of `Lang` instances are sortable by name. 
 ```python
->>> langs = [Lang("deu"), Lang("eng"), Lang("rus"), Lang("eng")]
->>> [lg.name for lg in sorted(langs)]
-['English', 'English', 'German', 'Russian']
+>>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
+['English', 'German', 'Russian']
 ```
 As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
 ```python
->>> [lg.pt3 for lg in set(langs)]
-['eng', 'rus', 'deu']
+>>> {Lang("de"): "foo", Lang("fr"):  "bar"}
+{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
 ```
 
 ### Iterator
@@ -168,15 +175,18 @@ When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValu
 'Gascon replaced by Occitan (post 1500)'
 ```
 
-## Sources of data used by iso639-lang
+## Speed
 
-As of February 2, 2024, iso639-lang is based on the latest official code tables provided by the ISO 639 registration authorities.
+`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than libraries that rely on an embedded database.
+
+## Sources
+
+As of August 21, 2024, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities.
  
- 
-| Standard  | Name                                                                                       | Registration Authority |
-| --------- | ------------------------------------------------------------------------------------------ | ---------------------- |
-| [ISO 639-1](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 1: Alpha-2 code*                                                                       | Infoterm               |
-| [ISO 639-2](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt) | *Part 2: Alpha-3 code*                                                                       | Library of Congress    |
-| [ISO 639-3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | *Part 3: Alpha-3 code for comprehensive coverage of languages*                               | SIL International      |
-| ISO 639-4 | *Part 4: Implementation guidelines and general principles for language coding* (not a list)  | ISO/TC 37/SC 2         |
-| [ISO 639-5](http://id.loc.gov/vocabulary/iso639-5.tsv) | *Part 5: Alpha-3 code for language families and groups*                                      | Library of Congress    |
+| Set                                                                            | Description                                                                                                                   | Registration Authority |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| [Set 1](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | _two-letter language identifiers for major, mostly national individual languages_                                            | Infoterm               |
+| [Set 2](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt)            | _three-letter language identifiers for a larger number of widely known individual languages and a number of language groups_ | Library of Congress    |
+| [Set 3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | _three-letter language identifiers covering all individual languages, including living, extinct and ancient languages_       | SIL International      |
+| [Set 5](http://id.loc.gov/vocabulary/iso639-5.tsv)                             | _three-letter language identifiers covering a larger set of language groups, living and extinct_                             | Library of Congress    |
+
