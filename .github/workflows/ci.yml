@@ -27,7 +27,7 @@ jobs:
     - name: Install package
       run: |
         python3 -m pip install --upgrade pip
-        pip install .
+        python3 -m pip install .
     - name: Test
       run: |
-        python test.py
+        python3 test.py
