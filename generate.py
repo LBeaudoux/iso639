@@ -1,11 +1,9 @@
 import json
-import pickle
 import sqlite3
 from collections import defaultdict, namedtuple
 from typing import Generator
 
 from iso639.datafile import get_file
-from iso639.iso639 import Lang
 
 Iso6392 = namedtuple(
     "Iso6392",
@@ -548,7 +546,6 @@ def serialize_other_names(db: sqlite3.Connection, datafile: str):
 
 
 def serialize_langs(db: sqlite3.Connection, datafile: str):
-    Lang._reset()
     with db:
         sql = """
                 SELECT iso639.name
@@ -558,12 +555,10 @@ def serialize_langs(db: sqlite3.Connection, datafile: str):
                 WHERE retirements.pt3 IS NULL
                 ORDER BY iso639.name
                 """
-        all_langs = []
-        for (name,) in db.execute(sql):
-            all_langs.append(Lang(name))
+        language_names = [row[0] for row in db.execute(sql)]
 
-    with open(datafile, "wb") as f:
-        pickle.dump(all_langs, f)
+    with open(datafile, "w", encoding="utf-8") as f:
+        json.dump(language_names, f)
 
 
 if __name__ == "__main__":
@@ -587,7 +582,7 @@ if __name__ == "__main__":
     names_path = get_file("names")
     load_names(names_path, con)
 
-    # export mapping results as JSON files
+    # serialize resulting mappings
     mapping_data_path = get_file("mapping_data")
     serialize_iso639(con, mapping_data_path)
     mapping_scope_path = get_file("mapping_scope")
@@ -603,7 +598,7 @@ if __name__ == "__main__":
     mapping_other_names_path = get_file("mapping_other_names")
     serialize_other_names(con, mapping_other_names_path)
 
-    # pickle the list of all possible Lang instances
+    # serialize sorted list of all possible language reference names
     langs_path = get_file("list_langs")
     serialize_langs(con, langs_path)
 

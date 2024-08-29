@@ -1,6 +1,5 @@
 import json
-import pickle
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 
 try:
     from importlib.resources import files
@@ -23,7 +22,7 @@ FILENAMES = {
     "mapping_macro": "data/iso-639_macro.json",
     "mapping_ref_name": "data/iso-639_ref_name.json",
     "mapping_other_names": "data/iso-639_other_names.json",
-    "list_langs": "data/iso-639_langs.pkl",
+    "list_langs": "data/iso-639_langs.json",
 }
 
 
@@ -32,21 +31,11 @@ def get_file(file_alias: str):
     return files(__package__).joinpath(FILENAMES[file_alias])
 
 
-def load_mapping(file_alias: str) -> Dict:
-    """Load an ISO 639 mapping JSON file"""
+def load_file(file_alias: str) -> Optional[Union[Dict, List]]:
+    """Load local JSON file"""
     file_path = get_file(file_alias)
     try:
         with file_path.open(encoding="utf-8") as f:
             return json.load(f)
     except FileNotFoundError:
-        return {}
-
-
-def load_langs() -> List:
-    """Load the pickled list of ISO 639 Langs"""
-    file_path = get_file("list_langs")
-    try:
-        with file_path.open("rb") as f:
-            return pickle.load(f)
-    except FileNotFoundError:
-        return []
+        return None

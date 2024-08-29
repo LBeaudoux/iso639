@@ -24,7 +24,7 @@ setuptools.setup(
         "Development Status :: 5 - Production/Stable",
     ],
     python_requires=">=3.7",
-    package_data={"iso639": ["data/*.json", "data/*.pkl"]},
+    package_data={"iso639": ["data/*.json"]},
     install_requires=[
         "importlib-resources;python_version<'3.9'",
     ],

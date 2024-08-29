@@ -1,7 +1,7 @@
 from operator import itemgetter
 from typing import Dict, Iterator, List, Union
 
-from .datafile import load_langs, load_mapping
+from .datafile import load_file
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
 
 
@@ -52,13 +52,13 @@ class Lang(tuple):
         "S": "Special",
     }
 
-    _data = load_mapping("mapping_data")
-    _scope = load_mapping("mapping_scope")
-    _type = load_mapping("mapping_type")
-    _deprecated = load_mapping("mapping_deprecated")
-    _macro = load_mapping("mapping_macro")
-    _ref_name = load_mapping("mapping_ref_name")
-    _other_names = load_mapping("mapping_other_names")
+    _data = load_file("mapping_data")
+    _scope = load_file("mapping_scope")
+    _type = load_file("mapping_type")
+    _deprecated = load_file("mapping_deprecated")
+    _macro = load_file("mapping_macro")
+    _ref_name = load_file("mapping_ref_name")
+    _other_names = load_file("mapping_other_names")
 
     __slots__ = ()  # set immutability of Lang
 
@@ -317,15 +317,6 @@ class Lang(tuple):
     def _get_other_names(cls, ref_name_value):
         return cls._other_names.get(ref_name_value, [])
 
-    @classmethod
-    def _reset(cls):
-        """Reload all mappings"""
-        cls._data = load_mapping("mapping_data")
-        cls._scope = load_mapping("mapping_scope")
-        cls._type = load_mapping("mapping_type")
-        cls._deprecated = load_mapping("mapping_deprecated")
-        cls._macro = load_mapping("mapping_macro")
-
 
 def iter_langs() -> Iterator[Lang]:
     """Iterate through all not deprecated ISO 639 languages
@@ -335,6 +326,6 @@ def iter_langs() -> Iterator[Lang]:
     Lang
         Lang instances ordered alphabetically by name
     """
-    sorted_langs = load_langs()
+    sorted_lang_names = load_file("list_langs")
 
-    return iter(sorted_langs)
+    return (Lang(lang_name) for lang_name in sorted_lang_names)
