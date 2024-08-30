@@ -247,7 +247,7 @@ def load_retirements(datafile: str, db: sqlite3.Connection):
 
 
 def filter_retirements(db: sqlite3.Connection):
-    """Discard infinite retirement loops"""
+    """Keep only retirements that are in effect"""
     with db:
         db.execute("DROP TABLE IF EXISTS retirements")
         db.execute(
@@ -262,6 +262,7 @@ def filter_retirements(db: sqlite3.Connection):
             )
             """
         )
+        # remove infinite retirement loops
         db.execute(
             """ 
             INSERT INTO retirements
@@ -280,6 +281,17 @@ def filter_retirements(db: sqlite3.Connection):
                     rt1.pt3 != rt1.change_to  
                     AND rt1.effective > rt2.effective
                 )
+            """
+        )
+        # remove languages that have been recreated
+        db.execute(
+            """
+            DELETE FROM retirements
+            WHERE pt3 IN (
+                SELECT retirements.pt3
+                FROM retirements
+                INNER JOIN iso639 ON retirements.pt3 = iso639.pt3
+            )
             """
         )
         db.execute(
