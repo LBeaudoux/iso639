@@ -50,7 +50,7 @@ bem|||Bemba|bemba
 ben||bn|Bengali|bengali
 ber|||Berber languages|berbères, langues
 bho|||Bhojpuri|bhojpuri
-bih||bh|Bihari languages|langues biharis
+bih|||Bihari languages|langues biharis
 bik|||Bikol|bikol
 bin|||Bini; Edo|bini; edo
 bis||bi|Bislama|bichlamar
@@ -106,7 +106,7 @@ dar|||Dargwa|dargwa
 day|||Land Dayak languages|dayak, langues
 del|||Delaware|delaware
 den|||Slave (Athapascan)|esclave (athapascan)
-dgr|||Dogrib|dogrib
+dgr|||Tlicho; Dogrib|tlicho; dogrib
 din|||Dinka|dinka
 div||dv|Divehi; Dhivehi; Maldivian|maldivien
 doi|||Dogri|dogri
