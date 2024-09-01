@@ -340,26 +340,22 @@ def load_macros(datafile: str, db: sqlite3.Connection):
             )
             """
         )
-        # route deprecated individual languages
+        # manage deprecated individual languages
         db.execute(
             """ 
             INSERT INTO macros
             SELECT DISTINCT
-                CASE 
-                    WHEN r1.change_to IS NULL OR r1.change_to = '' 
-                        THEN m.macro
-                    ELSE r1.change_to
-                END AS macro,
-                CASE 
-                    WHEN r2.change_to IS NULL OR r2.change_to = '' 
-                        THEN m.individual
-                    ELSE r2.change_to
-                END AS individual
+                m.macro,
+                m.individual
             FROM temp_macros AS m
             LEFT JOIN retirements r1
                 ON m.macro = r1.pt3
             LEFT JOIN retirements r2
                 ON m.individual = r2.pt3
+            WHERE m.individual_status = 'A'
+                AND r1.pt3 IS NULL
+                AND r2.pt3 IS NULL
+            ORDER BY m.macro, m.individual
             """
         )
         db.execute(
@@ -460,11 +456,22 @@ def serialize_deprecated(db: sqlite3.Connection, datafile: str):
 def serialize_macro(db: sqlite3.Connection, datafile: str):
     with db:
         mapping = {}
-        sql = "SELECT macro, individual FROM macros"
+        sql = """
+            SELECT macro, individual 
+            FROM macros
+            ORDER BY macro ASC, individual ASC
+            """
         for macro, individual in db.execute(sql):
             mapping.setdefault("macro", {}).setdefault(macro, []).append(
                 individual
             )
+
+        sql = """
+            SELECT individual, macro
+            FROM macros
+            ORDER BY individual ASC
+            """
+        for individual, macro in db.execute(sql):
             mapping.setdefault("individual", {})[individual] = macro
     with open(datafile, "w", encoding="utf-8") as f:
         json.dump(mapping, f)

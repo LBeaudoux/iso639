@@ -190,15 +190,7 @@ class Lang(tuple):
             the macrolanguage of this individual language, if there is one
         """
         macro_pt3 = self._get_macro(self.pt3)
-        if macro_pt3:
-            try:
-                macro = Lang(macro_pt3)
-            except InvalidLanguageValue:
-                pass
-            else:
-                return macro
-
-        return
+        return Lang(macro_pt3) if macro_pt3 else macro_pt3
 
     def individuals(self) -> List["Lang"]:
         """Get all individual languages of this macrolanguage
@@ -209,19 +201,7 @@ class Lang(tuple):
             the Lang instances of the individual languages of this
             macrolanguage, if it is one
         """
-        individuals = []
-        for lg in self._get_individuals(self.pt3):
-            try:
-                lang = Lang(lg)
-            except InvalidLanguageValue:
-                pass
-            except DeprecatedLanguageValue as e:
-                if e.change_to:
-                    individuals.append(Lang(e.change_to))
-            else:
-                individuals.append(lang)
-
-        return individuals
+        return [Lang(ind) for ind in self._get_individuals(self.pt3)]
 
     def other_names(self) -> List[str]:
         """Get all the names of this language that are not its
@@ -295,19 +275,19 @@ class Lang(tuple):
 
     @classmethod
     def _get_scope(cls, pt3_value):
-        abr = cls._scope.get(pt3_value, "")
+        abr = cls._scope.get(pt3_value)
 
-        return cls._abrs.get(abr) if abr else None
+        return cls._abrs.get(abr)
 
     @classmethod
     def _get_type(cls, pt3_value):
-        abr = cls._type.get(pt3_value, "")
+        abr = cls._type.get(pt3_value)
 
-        return cls._abrs.get(abr) if abr else None
+        return cls._abrs.get(abr)
 
     @classmethod
     def _get_macro(cls, pt3_value):
-        return cls._macro["individual"].get(pt3_value, "")
+        return cls._macro["individual"].get(pt3_value)
 
     @classmethod
     def _get_individuals(cls, pt3_value):
