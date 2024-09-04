@@ -9,12 +9,6 @@ except ImportError:
 
 
 FILENAMES = {
-    "pt3": "data/iso-639-3.tab",
-    "pt2": "data/ISO-639-2_utf-8.txt",
-    "pt5": "data/iso639-5.tsv",
-    "retirements": "data/iso-639-3_Retirements.tab",
-    "macros": "data/iso-639-3-macrolanguages.tab",
-    "names": "data/iso-639-3_Name_Index.tab",
     "mapping_data": "data/iso-639.json",
     "mapping_scope": "data/iso-639_scope.json",
     "mapping_type": "data/iso-639_type.json",
