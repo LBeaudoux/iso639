@@ -223,38 +223,44 @@ class Lang(tuple):
         elif isinstance(arg, str):
             if len(arg) == 3 and arg.lower() == arg:
                 for tg in ("pt3", "pt2b", "pt2t", "pt5"):
-                    cls._assert_not_deprecated(arg)
                     values = cls._get_language_values(tg, arg)
                     if values:
-                        return values
+                        break
             elif len(arg) == 2 and arg.lower() == arg:
-                return cls._get_language_values("pt1", arg)
+                values = cls._get_language_values("pt1", arg)
             else:
-                return cls._get_language_values("name", arg)
+                values = cls._get_language_values("name", arg)
+
+            return values if values else cls._assert_not_deprecated(arg)
 
     @classmethod
     def _validate_kwargs(cls, kwargs):
-        for tg in ("pt2b", "pt2t", "pt3", "pt5"):
-            try:
-                cls._assert_not_deprecated(kwargs[tg])
-            except KeyError:
-                pass
-
         params = set()
         for tg, lg in kwargs.items():
             if lg:
                 params.add(cls._get_language_values(tg, lg))
 
-        return params.pop() if len(params) == 1 else tuple()
+        if len(params) == 1:
+            return params.pop()
+
+        for v in kwargs.values():
+            try:
+                cls._assert_not_deprecated(v)
+            except KeyError:
+                pass
+
+        return tuple()
 
     @classmethod
     def _assert_not_deprecated(cls, lang_value):
-        try:
-            d = cls._deprecated[lang_value]
-        except KeyError:
-            pass
-        else:
-            raise DeprecatedLanguageValue(id=lang_value, **d)
+        for tag in ("id", "name"):
+            try:
+                d = cls._deprecated[tag][lang_value]
+            except KeyError:
+                pass
+            else:
+                d[tag] = lang_value
+                raise DeprecatedLanguageValue(**d)
 
     @classmethod
     def _get_language_values(cls, tag, language_value):

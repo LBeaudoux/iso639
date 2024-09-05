@@ -1,7 +1,7 @@
 import logging
 
 from .database import Database
-from .helpers import download, get_data, serialize
+from .utils import download, get_data, serialize
 
 logger = logging.getLogger(__name__)
 

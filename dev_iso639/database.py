@@ -186,24 +186,24 @@ class Database:
     def get_mapping_deprecated(self) -> Dict[str, Dict]:
         mapping = {}
         with self._con:
-            sql = """
-                SELECT
-                    rt.Id AS pt3,
-                    rt.Ref_Name AS name,
-                    rt.Ret_Reason AS reason,
-                    IFNULL(rt.Change_To, "") AS change_to,
-                    IFNULL(rt.Ret_Remedy, "") AS ret_remedy,
-                    rt.Effective AS effective
-                FROM ISO_639_3_Retirements rt
-                LEFT JOIN ISO_639_3
-                ON rt.Id = ISO_639_3.Id
-                WHERE ISO_639_3.Id IS NULL
-                ORDER BY pt3
-                """
-            for row in self._con.execute(sql):
-                dict_row = dict(row)
-                dict_row.pop("pt3")
-                mapping[row["pt3"]] = dict_row
+            for tag in ("id", "name"):
+                sql = """
+                    SELECT
+                        rt.Id AS id,
+                        rt.Ref_Name AS name,
+                        rt.Ret_Reason AS reason,
+                        IFNULL(rt.Change_To, "") AS change_to,
+                        IFNULL(rt.Ret_Remedy, "") AS ret_remedy,
+                        rt.Effective AS effective
+                    FROM ISO_639_3_Retirements rt
+                    ORDER BY {0}
+                    """.format(
+                    tag
+                )
+                for row in self._con.execute(sql):
+                    dict_row = dict(row)
+                    dict_row.pop(tag)
+                    mapping.setdefault(tag, {})[row[tag]] = dict_row
         return mapping
 
     def get_mapping_macro(self) -> Dict[str, Dict]:
