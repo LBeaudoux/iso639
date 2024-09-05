@@ -48,9 +48,15 @@ class DeprecatedLanguageValue(Exception):
         )
 
         self.msg = pt.format(reason, remedy, **kwargs)
-        self.name = kwargs.get("name", "")
-        self.change_to = kwargs.get("change_to", "")
-        self.ret_remedy = kwargs.get("remedy", "")
-        self.effective = kwargs.get("effective", "")
+        for attr_name in (
+            "id",
+            "name",
+            "reason",
+            "change_to",
+            "ret_remedy",
+            "effective",
+        ):
+            attr_value = kwargs.get(attr_name, "")
+            setattr(self, attr_name, attr_value)
 
         super().__init__(self.msg)
