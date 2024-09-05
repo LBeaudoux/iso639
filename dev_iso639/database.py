@@ -145,6 +145,29 @@ class Database:
                         FROM ISO_639_5
                         LEFT JOIN ISO_639_2
                             ON ISO_639_5.Code = ISO_639_2.Part2b
+                        UNION
+                        SELECT 
+                            substr(
+                                ISO_639_2.English_Name, 
+                                1, 
+                                instr(ISO_639_2.English_Name, ';') - 1
+                            ) AS name,
+                            IFNULL(ISO_639_2.Part1, "") AS pt1,
+                            ISO_639_2.Part2b AS pt2b, 
+                            IFNULL(
+                                ISO_639_2.Part2t, 
+                                IFNULL(ISO_639_2.Part2b, "")
+                            ) AS pt2t, 
+                            "" AS pt3,
+                            "" AS pt5
+                        FROM ISO_639_2
+                        LEFT JOIN ISO_639_3 
+                            ON ISO_639_2.Part2b = ISO_639_3.Part2B
+                        LEFT JOIN ISO_639_5 
+                            ON ISO_639_2.Part2b = ISO_639_5.Code
+                        WHERE ISO_639_3.Part2B IS NULL 
+                            AND ISO_639_5.Code IS NULL
+                            AND NOT ISO_639_2.Part2b like "%-%"
                         ORDER BY name
                     )
                     SELECT name, pt1, pt2b, pt2t, pt3, pt5 
@@ -215,42 +238,58 @@ class Database:
             sql = """ 
                 WITH ref_names AS (
                     SELECT
-                        ISO_639_3.Part2b AS code,
+                        ISO_639_3.Part2b AS id,
                         ISO_639_3.Ref_Name AS ref_name
                     FROM ISO_639_3
                     WHERE ISO_639_3.Part2b NOTNULL
                     UNION
                     SELECT
-                        ISO_639_3.Id AS code,
+                        ISO_639_3.Id AS id,
                         ISO_639_3.Ref_Name AS ref_name
                     FROM ISO_639_3
                     UNION
                     SELECT 
-                        ISO_639_2.Part2b AS code, 
+                        ISO_639_2.Part2b AS id, 
                         ISO_639_5.Label_English AS ref_name
                     FROM ISO_639_5
                     INNER JOIN ISO_639_2
-                      ON ISO_639_5.Code = ISO_639_2.Part2b
+                        ON ISO_639_5.Code = ISO_639_2.Part2b
+                    UNION
+                    SELECT 
+                        ISO_639_2.Part2b AS id,
+                        substr(
+                            ISO_639_2.English_Name, 
+                            1, 
+                            instr(ISO_639_2.English_Name, ';') - 1
+                        ) AS ref_name
+                    FROM ISO_639_2
+                    LEFT JOIN ISO_639_3 
+                        ON ISO_639_2.Part2b = ISO_639_3.Part2B
+                    LEFT JOIN ISO_639_5 
+                        ON ISO_639_2.Part2b = ISO_639_5.Code
+                    WHERE ISO_639_3.Part2B IS NULL 
+                        AND ISO_639_5.Code IS NULL
+                        AND NOT ISO_639_2.Part2b like "%-%"
                 )
                 SELECT 
                     ISO_639_3_Names.Print_Name AS other_name,
                     ref_names.ref_name
                 FROM ISO_639_3_Names
-                INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.code
+                INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.id
                     WHERE other_name != ref_name
                 UNION
                 SELECT 
                     ISO_639_3_Names.Inverted_Name AS other_name,
                     ref_names.ref_name
                 FROM ISO_639_3_Names
-                INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.code
+                INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.id
                     WHERE other_name != ref_name
                 UNION
                 SELECT 
                     ISO_639_2.English_Name AS other_name,
                     ref_names.ref_name
                 FROM ISO_639_2
-                INNER JOIN ref_names ON ISO_639_2.Part2b = ref_names.code
+                INNER JOIN ref_names ON ISO_639_2.Part2b = ref_names.id
                     WHERE other_name != ref_name
                 ORDER BY other_name
                 """
@@ -267,22 +306,38 @@ class Database:
             sql = """
                 WITH ref_names AS (
                     SELECT
-                        ISO_639_3.Part2b AS code,
+                        ISO_639_3.Part2b AS id,
                         ISO_639_3.Ref_Name AS ref_name
                     FROM ISO_639_3
                     WHERE ISO_639_3.Part2b NOTNULL
                     UNION
                     SELECT
-                        ISO_639_3.Id AS code,
+                        ISO_639_3.Id AS id,
                         ISO_639_3.Ref_Name AS ref_name
                     FROM ISO_639_3
                     UNION
                     SELECT 
-                        ISO_639_2.Part2b AS code, 
+                        ISO_639_2.Part2b AS id, 
                         ISO_639_5.Label_English AS ref_name
                     FROM ISO_639_5
                     INNER JOIN ISO_639_2
-                    ON ISO_639_5.Code = ISO_639_2.Part2b
+                        ON ISO_639_5.Code = ISO_639_2.Part2b
+                    UNION
+                    SELECT 
+                        ISO_639_2.Part2b AS id,
+                        substr(
+                            ISO_639_2.English_Name, 
+                            1, 
+                            instr(ISO_639_2.English_Name, ';') - 1
+                        ) AS ref_name
+                    FROM ISO_639_2
+                    LEFT JOIN ISO_639_3 
+                        ON ISO_639_2.Part2b = ISO_639_3.Part2B
+                    LEFT JOIN ISO_639_5 
+                        ON ISO_639_2.Part2b = ISO_639_5.Code
+                    WHERE ISO_639_3.Part2B IS NULL 
+                        AND ISO_639_5.Code IS NULL
+                        AND NOT ISO_639_2.Part2b like "%-%"
                 )
                 SELECT ref_name, group_concat(other_name, "; ")
                 FROM (
@@ -290,21 +345,21 @@ class Database:
                         ref_names.ref_name,
                         ISO_639_3_Names.Print_Name AS other_name
                     FROM ISO_639_3_Names
-                    INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.code
+                    INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.id
                         WHERE other_name != ref_name
                     UNION
                     SELECT 
                         ref_names.ref_name,
                         ISO_639_3_Names.Inverted_Name AS other_name
                     FROM ISO_639_3_Names
-                    INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.code
+                    INNER JOIN ref_names ON ISO_639_3_Names.Id = ref_names.id
                         WHERE other_name != ref_name
                     UNION
                     SELECT 
                         ref_names.ref_name,
                         ISO_639_2.English_Name AS other_name
                     FROM ISO_639_2
-                    INNER JOIN ref_names ON ISO_639_2.Part2b = ref_names.code
+                    INNER JOIN ref_names ON ISO_639_2.Part2b = ref_names.id
                         WHERE other_name != ref_name
                     ORDER BY ref_name, other_name
                 )
