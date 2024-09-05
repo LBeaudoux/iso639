@@ -136,12 +136,15 @@ class Database:
                             ISO_639_5.Label_English AS name, 
                             IFNULL(ISO_639_2.Part1, "") AS pt1, 
                             IFNULL(ISO_639_2.Part2b, "") AS pt2b, 
-                            IFNULL(ISO_639_2.Part2t, "") AS pt2t, 
+                            IFNULL(
+                                ISO_639_2.Part2t, 
+                                IFNULL(ISO_639_2.Part2b, "")
+                            ) AS pt2t, 
                             "" AS pt3, 
                             ISO_639_5.Code AS pt5
                         FROM ISO_639_5
                         LEFT JOIN ISO_639_2
-                        ON ISO_639_5.Code = ISO_639_2.Part2b
+                            ON ISO_639_5.Code = ISO_639_2.Part2b
                         ORDER BY name
                     )
                     SELECT name, pt1, pt2b, pt2t, pt3, pt5 

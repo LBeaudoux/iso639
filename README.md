@@ -49,6 +49,8 @@ And now with the identifier of a group of languages.
 'Celtic languages'
 >>> lg.pt2b # 639-2 bibliographic identifier
 'cel'
+>>> lg.pt2t # 639-2 terminological identifier
+'cel'
 >>> lg.pt5 # 639-5 identifier
 'cel'
 ```
