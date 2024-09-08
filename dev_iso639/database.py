@@ -415,6 +415,21 @@ class Database:
                 SELECT 
                     ISO_639_5.Label_English AS name
                 FROM ISO_639_5
+                UNION
+                SELECT 
+                    substr(
+                        ISO_639_2.English_Name, 
+                        1, 
+                        instr(ISO_639_2.English_Name, ';') - 1
+                    ) AS name
+                FROM ISO_639_2
+                LEFT JOIN ISO_639_3 
+                    ON ISO_639_2.Part2b = ISO_639_3.Part2B
+                LEFT JOIN ISO_639_5 
+                    ON ISO_639_2.Part2b = ISO_639_5.Code
+                WHERE ISO_639_3.Part2B IS NULL 
+                    AND ISO_639_5.Code IS NULL
+                    AND NOT ISO_639_2.Part2b like "%-%"
                 ORDER BY name
                 """
             language_names = [row["name"] for row in self._con.execute(sql)]
