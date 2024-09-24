@@ -1,35 +1,36 @@
 from operator import itemgetter
-from typing import Dict, Iterator, List, Union
+from typing import Dict, Iterator, List, Optional, Union
 
 from .datafile import load_file
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
 
 
 class Lang(tuple):
-    """Lang handles the ISO 639 series of international standards
-    for language codes
+    """ISO 639 reference name and identifiers of a language or group of
+    languages.
 
-    Instantiable with any ISO 639 language code or name as argument
-    (case sensitive)
+    Can be instantiated with any ISO 639 identifier or name as an argument.
+    Case sensitive.
 
     ...
 
     Attributes
     ----------
     name : str
-        ISO 639-3 reference language name or ISO 639-5 English name
+        ISO 639-3 reference name for languages, ISO 639-5 English name for
+        groups of languages.
     pt1 : str
-        two-letter ISO 639-1 code, if there is one
+        two-letter ISO 639-1 identifier, if there is one.
     pt2b : str
-        three-letter ISO 639-2 code for bibliographic applications,
-        if there is one
+        three-letter ISO 639-2/B identifier for bibliographic applications, if
+        there is one
     pt2t : str
-        three-letter ISO 639-2 code for terminology applications,
+        three-letter ISO 639-2/T identifier for terminology applications,
         if there is one
     pt3 : str
-        three-letter ISO 639-3 code, if there is one
+        three-letter ISO 639-3 identifier, if there is one
     pt5 : str
-        three-letter ISO 639-5 code, if there is one
+        three-letter ISO 639-5 identifier, if there is one
 
     Examples
     --------
@@ -62,35 +63,14 @@ class Lang(tuple):
 
     __slots__ = ()  # set immutability of Lang
 
-    def __new__(cls, *args: Union[str, "Lang"], **kwargs: str):
-        # validate positional argument
-        if len(args) == 1:
-            args_values = cls._validate_arg(args[0])
-            if not args_values:
-                raise InvalidLanguageValue(*args, **kwargs)
-        else:
-            args_values = tuple()
-
-        # validate keyword arguments
-        if kwargs:
-            kwargs_values = cls._validate_kwargs(kwargs)
-            if not kwargs_values:
-                raise InvalidLanguageValue(*args, **kwargs)
-        else:
-            kwargs_values = tuple()
-
-        # check compatiblity between positional and keyword arguments
-        if args_values == kwargs_values and args_values:
-            language_values = args_values
-        elif args_values and not kwargs_values:
-            language_values = args_values
-        elif kwargs_values and not args_values:
-            language_values = kwargs_values
-        else:
-            raise InvalidLanguageValue(*args, **kwargs)
+    def __new__(cls, name_or_identifier: Union[str, "Lang"]):
+        lang_tuple = cls._validate_arg(name_or_identifier)
+        if lang_tuple == tuple():  # not valid argument
+            cls._assert_not_deprecated(name_or_identifier)
+            raise InvalidLanguageValue(name_or_identifier=name_or_identifier)
 
         # instantiate as a tuple of ISO 639 language values
-        return tuple.__new__(cls, language_values)
+        return tuple.__new__(cls, lang_tuple)
 
     def __repr__(self):
         chunks = ["=".join((tg, repr(getattr(self, tg)))) for tg in self._tags]
@@ -115,169 +95,147 @@ class Lang(tuple):
 
     @property
     def name(self) -> str:
-        """Gets the ISO 639 name of this language"""
+        """The ISO 639 reference name of the language or group of languages."""
         return tuple.__getitem__(self, 0)
 
     @property
     def pt1(self) -> str:
-        """Gets the ISO 639-1 code of this language"""
+        """The ISO 639-1 identifier of the language."""
         return tuple.__getitem__(self, 1)
 
     @property
     def pt2b(self) -> str:
-        """Gets the ISO 639-2B code of this language"""
+        """The ISO 639-2/B identifier of the language or group of languages."""
         return tuple.__getitem__(self, 2)
 
     @property
     def pt2t(self) -> str:
-        """Gets the ISO 639-2T code of this language"""
+        """The ISO 639-2/T identifier of the language or group of languages."""
         return tuple.__getitem__(self, 3)
 
     @property
     def pt3(self) -> str:
-        """Gets the ISO 639-3 code of this language"""
+        """The ISO 639-3 identifier of the language."""
         return tuple.__getitem__(self, 4)
 
     @property
     def pt5(self) -> str:
-        """Gets the ISO 639-5 code of this language"""
+        """The ISO 639-5 identifier of the group of languages."""
         return tuple.__getitem__(self, 5)
 
     def asdict(self) -> Dict[str, str]:
-        """Get ISO 639 language name and codes as a Python
-        dictionary.
+        """Get the attributes of the `Lang` as a Python dictionary.
 
         Returns
         -------
         Dict[str, str]
-            A dictionary containing the values of the 'name',
-            'pt1', 'pt2b', 'pt2t', 'pt3' and 'pt5' attibutes.
+            A dictionary containing the values of the 'name', 'pt1', 'pt2b',
+            'pt2t', 'pt3' and 'pt5' attibutes.
         """
 
         return {tg: getattr(self, tg) for tg in self._tags}
 
-    def scope(self) -> str:
-        """Gets the ISO 639-3 scope of this language
+    def scope(self) -> Optional[str]:
+        """Get the scope of the language according to ISO 639-3.
 
         Returns
         -------
         str
-            the ISO 639-3 scope of this language among 'Individual',
-            'Macrolanguage' and 'Special'.
-            None is returned by not ISO 639-3 languages.
+            The scope of the language among 'Individual','Macrolanguage' and
+            'Special'. Returns None for groups of languages.
         """
         return self._get_scope(self.pt3)
 
-    def type(self) -> str:
-        """Gets the ISO 639-3 type of this language
+    def type(self) -> Optional[str]:
+        """Get the type of the language according to ISO 639-3.
 
         Returns
         -------
         str
-            the ISO 639-3 type of this language among 'Ancient',
-            'Constructed', 'Extinct', 'Historical', 'Living' and
-            'Special'.
-            None is returned by not ISO 639-3 languages.
+            The ISO 639-3 type of this language among 'Ancient',
+            'Constructed', 'Extinct', 'Historical', 'Living' and'Special'.
+            Returns None for groups of languages.
         """
         return self._get_type(self.pt3)
 
-    def macro(self) -> "Lang":
-        """Get the macrolanguage of this individual language
+    def macro(self) -> Optional["Lang"]:
+        """Get the macrolanguage of an individual language.
 
         Returns
         -------
         iso639.Lang
-            the macrolanguage of this individual language, if there is one
+            The macrolanguage of the individual language, if there is one.
         """
         macro_pt3 = self._get_macro(self.pt3)
         return Lang(macro_pt3) if macro_pt3 else macro_pt3
 
     def individuals(self) -> List["Lang"]:
-        """Get all individual languages of this macrolanguage
+        """Get all individual languages of a macrolanguage.
 
         Returns
         -------
         list of Lang
-            the Lang instances of the individual languages of this
-            macrolanguage, if it is one
+            The `Lang` instances of the individual languages of a
+            macrolanguage, sorted by name.
         """
         return [Lang(ind) for ind in self._get_individuals(self.pt3)]
 
     def other_names(self) -> List[str]:
-        """Get all the names of this language that are not its
-        reference name
+        """Get all the names of this language that are not its reference name.
 
         Returns
         -------
         list of str
-            the possible other ISO 639-3 printed names or
-            ISO 639-3 inverted names or ISO 639-2 English names of
-            this language, in alphabetical order.
+            The possible other ISO 639-3 printed names or ISO 639-3 inverted
+            names or ISO 639-2 English names of the language, in alphabetical
+            order.
         """
         return self._get_other_names(self.name)
 
     @classmethod
-    def _validate_arg(cls, arg):
-        if isinstance(arg, Lang):
-            return tuple(map(lambda x: getattr(arg, x), cls._tags))
-        elif isinstance(arg, str):
-            if len(arg) == 3 and arg.lower() == arg:
+    def _validate_arg(cls, arg_value):
+        if isinstance(arg_value, Lang):
+            return tuple(map(lambda x: getattr(arg_value, x), cls._tags))
+        elif isinstance(arg_value, str):
+            if len(arg_value) == 3 and arg_value.lower() == arg_value:
                 for tg in ("pt3", "pt2b", "pt2t", "pt5"):
-                    values = cls._get_language_values(tg, arg)
-                    if values:
-                        break
-            elif len(arg) == 2 and arg.lower() == arg:
-                values = cls._get_language_values("pt1", arg)
+                    lang_tuple = cls._get_language_tuple(tg, arg_value)
+                    if lang_tuple:
+                        return lang_tuple
+            elif len(arg_value) == 2 and arg_value.lower() == arg_value:
+                return cls._get_language_tuple("pt1", arg_value)
             else:
-                values = cls._get_language_values("name", arg)
-
-            return values if values else cls._assert_not_deprecated(arg)
-
-    @classmethod
-    def _validate_kwargs(cls, kwargs):
-        params = set()
-        for tg, lg in kwargs.items():
-            if lg:
-                params.add(cls._get_language_values(tg, lg))
-
-        if len(params) == 1:
-            return params.pop()
-
-        for v in kwargs.values():
-            try:
-                cls._assert_not_deprecated(v)
-            except KeyError:
-                pass
+                return cls._get_language_tuple("name", arg_value)
 
         return tuple()
 
     @classmethod
-    def _assert_not_deprecated(cls, lang_value):
-        for tag in ("id", "name"):
+    def _assert_not_deprecated(cls, arg_value):
+        for key in ("id", "name"):
             try:
-                d = cls._deprecated[tag][lang_value]
+                d = cls._deprecated[key][arg_value]
             except KeyError:
                 pass
             else:
-                d[tag] = lang_value
+                d[key] = arg_value
                 raise DeprecatedLanguageValue(**d)
 
     @classmethod
-    def _get_language_values(cls, tag, language_value):
+    def _get_language_tuple(cls, tag, arg_value):
         if tag == "name":
-            ref_value = cls._ref_name.get(language_value, language_value)
+            ref_value = cls._ref_name.get(arg_value, arg_value)
         else:
-            ref_value = language_value
+            ref_value = arg_value
 
         try:
-            language_dict = cls._data[tag][ref_value]
+            lang_dict = cls._data[tag][ref_value]
         except KeyError:
-            language_tuple = tuple()
+            lang_tuple = tuple()
         else:
-            language_dict[tag] = ref_value
-            language_tuple = itemgetter(*cls._tags)(language_dict)
+            lang_dict[tag] = ref_value
+            lang_tuple = itemgetter(*cls._tags)(lang_dict)
 
-        return language_tuple
+        return lang_tuple
 
     @classmethod
     def _get_scope(cls, pt3_value):
@@ -305,12 +263,14 @@ class Lang(tuple):
 
 
 def iter_langs() -> Iterator[Lang]:
-    """Iterate through all not deprecated ISO 639 languages
+    """Iterate through all languages that are in ISO 639.
+
+    Does not yield languages that are depracted according to ISO 639.
 
     Yields
     -------
     Lang
-        Lang instances ordered alphabetically by name
+        `Lang` instances ordered alphabetically by reference name.
     """
     sorted_lang_names = load_file("list_langs")
 

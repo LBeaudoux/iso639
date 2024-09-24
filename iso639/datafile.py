@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional, Union
+from typing import Any
 
 try:
     from importlib.resources import files
@@ -20,12 +20,12 @@ FILENAMES = {
 }
 
 
-def get_file(file_alias: str):
+def get_file(file_alias: str) -> Any:
     """Get the path of a local data file"""
     return files(__package__).joinpath(FILENAMES[file_alias])
 
 
-def load_file(file_alias: str) -> Optional[Union[Dict, List]]:
+def load_file(file_alias: str) -> Any:
     """Load local JSON file"""
     file_path = get_file(file_alias)
     try:

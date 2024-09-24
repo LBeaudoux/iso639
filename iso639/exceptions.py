@@ -1,22 +1,24 @@
 class InvalidLanguageValue(Exception):
-    """Exception raised when the arguments and keyword arguments passed to
-    the Lang constructor are not a valid combination of:
-    - ISO 639 language name
-    - ISO 639-1 language code
-    - ISO 639-2B language code
-    - ISO 639-2T language code
-    - ISO 639-3 language code
-    - ISO 639-5 language code
+    """Exception raised when the argument passed to the `Lang` constructor is
+    not a valid:
+    - ISO 639-1 identifier
+    - ISO 639-2 English name
+    - ISO 639-2/B identifier
+    - ISO 639-2/T identifier
+    - ISO 639-3 identifier
+    - ISO 639-3 inverted name
+    - ISO 639-3 printed name
+    - ISO 639-3 reference name
+    - ISO 639-5 identifier
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name_or_identifier):
 
-        pt_msg = (
-            "(*{0}, **{1}). "
-            "Only valid ISO 639 language values are supported as arguments."
+        self.invalid_value = name_or_identifier
+        self.msg = (
+            f"'{name_or_identifier}' is not a valid "
+            "ISO 639 name or identifier."
         )
-
-        self.msg = pt_msg.format(args, kwargs)
 
         super().__init__(self.msg)
 
