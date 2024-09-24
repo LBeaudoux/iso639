@@ -18,7 +18,7 @@ Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5='')
 ```console
 $ pip install iso639-lang
 ```
-`iso639-lang` supports Python 3.7+.  
+`iso639-lang` supports Python 3.8+.  
   
 ## Usage
 
@@ -47,9 +47,9 @@ And now with the identifier of a group of languages.
 >>> lg = Lang("cel")
 >>> lg.name # 639-5 English name
 'Celtic languages'
->>> lg.pt2b # 639-2 bibliographic identifier
+>>> lg.pt2b # 639-2/B bibliographic identifier
 'cel'
->>> lg.pt2t # 639-2 terminological identifier
+>>> lg.pt2t # 639-2/T terminological identifier
 'cel'
 >>> lg.pt5 # 639-5 identifier
 'cel'
@@ -85,7 +85,7 @@ You can use the `asdict` method to return ISO 639 values as a Python dictionary
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
-### In data structures
+### In Data Structures
 
 Lists of `Lang` instances are sortable by name. 
 ```python
