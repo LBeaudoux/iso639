@@ -26,8 +26,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install package
       run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install .
+        python -m pip install --upgrade pip
+        python -m pip install .
     - name: Test
       run: |
-        python3 test.py
+        pip install pytest 
+        pytest tests/
