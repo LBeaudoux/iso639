@@ -22,8 +22,8 @@ class InvalidLanguageValue(Exception):
 
 
 class DeprecatedLanguageValue(Exception):
-    """Exception raised when the arguments and keyword arguments passed to the
-    Lang constructor point to a deprecated ISO 639-3 language code
+    """Exception raised when the argument passed to the `Lang` constructor
+    points to a deprecated ISO 639 language name or identifier.
     """
 
     def __init__(self, *args, **kwargs):
@@ -34,12 +34,19 @@ class DeprecatedLanguageValue(Exception):
             "N": "non-existent",
             "S": "split",
             "M": "merge",
+            "Add": "newly added",
+            "Dep": "deprecated",
+            "CC": "code change",
+            "NC": "name change",
+            "NA": "variant name(s) added",
         }
         reason = reasons.get(kwargs.get("reason"))
-        if kwargs.get("ret_remedy"):
-            remedy = "{ret_remedy}.".format(**kwargs)
-        elif kwargs.get("change_to"):
+        if kwargs.get("change_to"):
             remedy = "Use [{change_to}] instead.".format(**kwargs)
+        elif kwargs.get("ret_remedy"):
+            remedy = kwargs["ret_remedy"]
+            if not remedy.endswith("."):
+                remedy += "."
         else:
             remedy = ""
         pt = (

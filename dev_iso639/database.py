@@ -1,6 +1,6 @@
 import sqlite3
 from collections import defaultdict
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -10,7 +10,6 @@ class Database:
 
     def __init__(self, database: str):
         self._db = database
-        self._con = None
 
     def __enter__(self):
         self._con = sqlite3.connect(self._db)
@@ -35,6 +34,24 @@ class Database:
                 """
             )
             data.to_sql("ISO_639_2", self._con, if_exists="append")
+
+    def load_iso6392_changes(self, data: pd.DataFrame) -> None:
+        with self._con:
+            self._con.execute("DROP TABLE IF EXISTS ISO_639_2_Changes")
+            self._con.execute(
+                """
+                CREATE TABLE ISO_639_2_Changes (
+                    Part1 TEXT,
+                    Part2 TEXT,
+                    English_Name TEXT NOT NULL,
+                    French_Name TEXT NOT NULL,
+                    Date_Added_Or_Changed DATE,
+                    Category_Of_Change CHAR(3),
+                    Notes TEXT
+                )
+                """
+            )
+            data.to_sql("ISO_639_2_Changes", self._con, if_exists="append")
 
     def load_iso6393(self, data: pd.DataFrame) -> None:
         with self._con:
@@ -117,20 +134,44 @@ class Database:
             )
             data.to_sql("ISO_639_5", self._con, if_exists="append")
 
-    def get_mapping_core(self) -> Dict[str, Dict]:
-        mapping = {}
+    def load_iso6395_changes(self, data: pd.DataFrame) -> None:
+        with self._con:
+            self._con.execute("DROP TABLE IF EXISTS ISO_639_5_Changes")
+            self._con.execute(
+                """
+                CREATE TABLE ISO_639_5_Changes (
+                    Date DATE,
+                    Code TEXT,
+                    Reason TEXT
+                )
+                """
+            )
+            data.to_sql("ISO_639_5_Changes", self._con, if_exists="append")
+
+    def get_mapping_core(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        mapping: Dict[str, Dict[str, Dict[str, str]]] = {}
         with self._con:
             for tag in ("name", "pt1", "pt2b", "pt2t", "pt3", "pt5"):
                 sql = """
                     WITH ISO_639 AS (
                         SELECT
                             ISO_639_3.Ref_Name AS name, 
-                            IFNULL(ISO_639_3.Part1, "") AS pt1, 
+                            CASE 
+                                WHEN Dep.Part1 NOT NULL THEN Dep.Change_To
+                                ELSE IFNULL(ISO_639_3.Part1, "")
+                            END AS pt1, 
                             IFNULL(ISO_639_3.Part2b, "") AS pt2b, 
                             IFNULL(ISO_639_3.Part2t, "") AS pt2t, 
                             ISO_639_3.Id AS pt3, 
                             "" AS pt5
                         FROM ISO_639_3
+                        LEFT JOIN (
+                            SELECT
+                              SUBSTR(Part1, INSTR(Part1, '-') + 1, 2) Part1,
+                              SUBSTR(Part1, 1, INSTR(Part1, ' ') - 1) Change_To
+                            FROM ISO_639_2_Changes
+                            WHERE Part1 like "%[%" AND Notes NOT NULL 
+                        ) Dep ON ISO_639_3.Part1 = Dep.Part1
                         UNION
                         SELECT 
                             ISO_639_5.Label_English AS name, 
@@ -183,9 +224,54 @@ class Database:
                     mapping.setdefault(tag, {})[row[tag]] = dict_row
         return mapping
 
-    def get_mapping_deprecated(self) -> Dict[str, Dict]:
-        mapping = {}
+    def get_mapping_deprecated(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        mapping: Dict[str, Dict[str, Dict[str, str]]] = {}
         with self._con:
+            for tag in ("id", "name"):
+                sql = """
+                    SELECT
+                        SUBSTR(Part2, INSTR(Part2, '-') + 1, 3) AS id,
+                        CASE INSTR(English_Name, ';')
+                            WHEN 0 THEN English_Name
+                            ELSE SUBSTR(
+                                English_Name, 
+                                0, 
+                                INSTR(English_Name, ';')
+                            )
+                        END AS name,
+                        Category_Of_Change AS reason,
+                        SUBSTR(Part2, 1, INSTR(Part2, ' ') - 1) AS change_to,
+                        Notes AS ret_remedy,
+                        Date_Added_Or_Changed AS effective
+                    FROM ISO_639_2_Changes
+                    WHERE 
+                        Part2 like "%[%" 
+                        AND Notes NOT NULL 
+                        AND Date_Added_Or_Changed < "2007-02-01"
+                    UNION
+                    SELECT
+                        SUBSTR(Part1, INSTR(Part1, '-') + 1, 2) AS id,
+                        CASE INSTR(English_Name, ';')
+                            WHEN 0 THEN English_Name
+                            ELSE SUBSTR(
+                                English_Name, 
+                                0, 
+                                INSTR(English_Name, ';')
+                            )
+                        END AS name,
+                        Category_Of_Change AS reason,
+                        SUBSTR(Part1, 1, INSTR(Part1, ' ') - 1) AS change_to,
+                        Notes AS ret_remedy,
+                        Date_Added_Or_Changed AS effective
+                    FROM ISO_639_2_Changes
+                    WHERE Part1 like "%[%"
+                        AND Notes NOT NULL 
+                    """
+                for row in self._con.execute(sql):
+                    dict_row = dict(row)
+                    dict_row.pop(tag)
+                    mapping.setdefault(tag, {})[row[tag]] = dict_row
+
             for tag in ("id", "name"):
                 sql = """
                     SELECT
@@ -196,18 +282,20 @@ class Database:
                         IFNULL(rt.Ret_Remedy, "") AS ret_remedy,
                         rt.Effective AS effective
                     FROM ISO_639_3_Retirements rt
-                    ORDER BY {0}
-                    """.format(
-                    tag
-                )
+                    WHERE Effective >= "2007-02-01"
+                    """
                 for row in self._con.execute(sql):
                     dict_row = dict(row)
                     dict_row.pop(tag)
                     mapping.setdefault(tag, {})[row[tag]] = dict_row
+
+        mapping["id"] = dict(sorted(mapping["id"].items()))
+        mapping["name"] = dict(sorted(mapping["name"].items()))
+
         return mapping
 
-    def get_mapping_macro(self) -> Dict[str, Dict]:
-        mapping = {}
+    def get_mapping_macro(self) -> Dict[str, Dict[str, Any]]:
+        mapping: Dict[str, Dict[str, Any]] = {}
         with self._con:
             sql = """
                 SELECT
@@ -301,7 +389,7 @@ class Database:
 
         return dict(sorted(mapping.items()))
 
-    def get_mapping_other_names(self) -> Dict[str, List]:
+    def get_mapping_other_names(self) -> Dict[str, List[str]]:
         with self._con:
             sql = """
                 WITH ref_names AS (

@@ -1,7 +1,7 @@
 import logging
 
 from .database import Database
-from .utils import download, get_data, serialize
+from .utils import download, get_data, scrape, serialize
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,8 @@ def download_source_data_files() -> None:
         "iso639-5.tsv",
     ):
         download(file_name)
+    for file_name in ("ISO-639-2_code_changes.tsv", "iso639-5_changes.tsv"):
+        scrape(file_name)
 
 
 def generate_library_embedded_data_files() -> None:
@@ -29,6 +31,9 @@ def generate_library_embedded_data_files() -> None:
         # source data files are loaded into the database
         iso6392 = get_data("ISO-639-2_utf-8.txt")
         db.load_iso6392(iso6392)
+
+        iso6392_changes = get_data("ISO-639-2_code_changes.tsv")
+        db.load_iso6392_changes(iso6392_changes)
 
         iso6393 = get_data("iso-639-3.tab")
         db.load_iso6393(iso6393)
@@ -44,6 +49,9 @@ def generate_library_embedded_data_files() -> None:
 
         iso6395 = get_data("iso639-5.tsv")
         db.load_iso6395(iso6395)
+
+        iso6395_changes = get_data("iso639-5_changes.tsv")
+        db.load_iso6395_changes(iso6395_changes)
 
         # export generated data files to the iso639-lang library
         mapping_core = db.get_mapping_core()

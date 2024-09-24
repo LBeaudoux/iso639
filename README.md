@@ -165,16 +165,16 @@ When an invalid language value is passed to `Lang`, an `InvalidLanguageValue` ex
 "'foobar' not supported by ISO 639"
 ```
 
-When an deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
+When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
 ```python
 >>> from iso639.exceptions import DeprecatedLanguageValue
 >>> try:
 ...     Lang("gsc")
 ... except DeprecatedLanguageValue as e:
 ...     lg = Lang(e.change_to)
-...     f"{e.name} replaced by {lg.name}"
+...     f"{e.name} replaced by {lg.name}."
 ...
-'Gascon replaced by Occitan (post 1500)'
+'Gascon replaced by Occitan (post 1500).'
 ```
 
 

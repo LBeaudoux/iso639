@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import Dict, List, Union
+from io import StringIO
+from typing import Any
 
 import pandas as pd
 import requests
@@ -20,7 +21,7 @@ def download(file_name: str) -> None:
         The name of an official ISO 639 data file.
     """
     data_file = DataFile(file_name)
-    with requests.get(data_file.url) as r:
+    with requests.get(data_file.download_url) as r:
         file_encoding = r.apparent_encoding
         with open(data_file.path, "wb") as f:
             f.write(r.content)
@@ -29,6 +30,23 @@ def download(file_name: str) -> None:
         f"{data_file.name} ({file_encoding} encoding) "
         f"downloaded at {data_file.path}"
     )
+
+
+def scrape(file_name: str) -> None:
+    """Scrapes an ISO 639 table to the project download directory.
+
+    Parameters
+    ----------
+    file_name : str
+        The name of an official ISO 639 data file.
+    """
+    data_file = DataFile(file_name)
+    with requests.get(data_file.scrap_url) as r:
+        html_str = StringIO(r.text)
+        table = pd.read_html(html_str)[1]
+    table.to_csv(data_file.path, sep="\t", index=False)
+
+    logger.info(f"{data_file.name} scraped at {data_file.path}")
 
 
 def get_data(file_name: str) -> pd.DataFrame:
@@ -48,7 +66,7 @@ def get_data(file_name: str) -> pd.DataFrame:
     return pd.read_csv(data_file.path, **data_file.params)
 
 
-def serialize(data: Union[List, Dict], file_name: str) -> None:
+def serialize(data: Any, file_name: str) -> None:
     """Saves an ISO 639 mapping or list as a JSON file.
 
     Parameters
