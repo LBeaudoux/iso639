@@ -34,9 +34,9 @@ Let's try with the identifier of an individual language.
 'German'
 >>> lg.pt1 # 639-1 identifier
 'de'
->>> lg.pt2b # 639-2 bibliographic identifier
+>>> lg.pt2b # 639-2/B bibliographic identifier
 'ger'
->>> lg.pt2t # 639-2 terminological identifier
+>>> lg.pt2t # 639-2/T terminological identifier
 'deu'
 >>> lg.pt3 # 639-3 identifier
 'deu'
@@ -185,7 +185,7 @@ When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue
 
 ## Sources
 
-As of August 27, 2024, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
+As of September 25, 2024, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
  
 | Set                                                                            | Description                                                                                                                  | Registration Authority | Last Modified                                                             |
 |--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------|
