@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iso639-lang"
+version = "2.3.0"
+description = "A fast, simple ISO 639 library."
+keywords = ["ISO 639", "ISO 639-1", "ISO 639-2", "ISO 639-3", "ISO 639-5", "language code"]
+readme = "README.md"
+authors = [
+    {name = "Laurent Beaudoux", email = "lbeaudoux@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Internationalization",
+    "Topic :: Software Development :: LocalizationTopic :: Text Processing :: Linguistic",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "importlib-resources;python_version<'3.9'",
+]
+
+[project.urls]
+Homepage = "https://github.com/LBeaudoux/iso639"
+
+[tool.setuptools]
+packages = ["iso639", "iso639.data"]
+
+[tool.setuptools.package-data]
+iso639 = ["data/*.json"]
