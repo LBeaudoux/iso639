@@ -28,4 +28,4 @@ jobs:
     - name: Test
       run: |
         pip install pytest 
-        pytest tests/
+        pytest tests dev_tests
