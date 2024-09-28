@@ -34,6 +34,13 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/LBeaudoux/iso639"
 
+[tool.black]
+line-length = 79
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
 [tool.setuptools]
 packages = ["iso639", "iso639.data"]
 
