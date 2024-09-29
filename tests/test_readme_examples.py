@@ -138,7 +138,7 @@ def test_example_other_names():
 def test_example_invalid_value():
     with pytest.raises(InvalidLanguageValue) as exc_info:
         Lang("foobar")
-    s = "'foobar' is not a valid ISO 639 name or identifier."
+    s = "'foobar' is not a valid Lang argument."
     assert exc_info.value.msg == s
 
 

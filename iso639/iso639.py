@@ -63,14 +63,71 @@ class Lang(tuple):
 
     __slots__ = ()  # set immutability of Lang
 
-    def __new__(cls, name_or_identifier: Union[str, "Lang"]):
-        lang_tuple = cls._validate_arg(name_or_identifier)
-        if lang_tuple == tuple():  # not valid argument
-            cls._assert_not_deprecated(name_or_identifier)
-            raise InvalidLanguageValue(name_or_identifier=name_or_identifier)
+    def __new__(
+        cls,
+        name_or_identifier: Optional[Union[str, "Lang"]] = None,
+        name: Optional[str] = None,
+        pt1: Optional[str] = None,
+        pt2b: Optional[str] = None,
+        pt2t: Optional[str] = None,
+        pt3: Optional[str] = None,
+        pt5: Optional[str] = None,
+    ):
+        # parse main argument
+        if name_or_identifier is None:
+            arg_lang_tuple = None
+        else:
+            arg_lang_tuple = cls._validate_arg(name_or_identifier)
 
-        # instantiate as a tuple of ISO 639 language values
-        return tuple.__new__(cls, lang_tuple)
+        # parse other arguments
+        if all(v is None for v in (name, pt1, pt2b, pt2t, pt3, pt5)):
+            kwargs_lang_tuple = None
+        else:
+            kwargs_lang_tuple = cls._validate_kwargs(
+                name=name, pt1=pt1, pt2b=pt2b, pt2t=pt2t, pt3=pt3, pt5=pt5
+            )
+
+        # check compatiblity between main argument and other arguments
+        if arg_lang_tuple is None and kwargs_lang_tuple is None:
+            lang_tuple = None
+        elif arg_lang_tuple is not None and kwargs_lang_tuple is None:
+            lang_tuple = arg_lang_tuple
+        elif kwargs_lang_tuple is not None and arg_lang_tuple is None:
+            lang_tuple = kwargs_lang_tuple
+        elif (
+            arg_lang_tuple is not None
+            and kwargs_lang_tuple is not None
+            and arg_lang_tuple == kwargs_lang_tuple
+        ):
+            lang_tuple = arg_lang_tuple
+        else:
+            lang_tuple = tuple()
+
+        # chack if arguments match a deprecated language value
+        if lang_tuple == tuple():
+            cls._assert_not_deprecated(
+                name_or_identifier=name_or_identifier,
+                name=name,
+                pt1=pt1,
+                pt2b=pt2b,
+                pt2t=pt2t,
+                pt3=pt3,
+                pt5=pt5,
+            )
+
+        if not lang_tuple:
+            raise InvalidLanguageValue(
+                name_or_identifier=name_or_identifier,
+                name=name,
+                pt1=pt1,
+                pt2b=pt2b,
+                pt2t=pt2t,
+                pt3=pt3,
+                pt5=pt5,
+            )
+        else:
+            # instantiate as a tuple of ISO 639 language values
+            return tuple.__new__(cls, lang_tuple)
 
     def __repr__(self):
         chunks = ["=".join((tg, repr(getattr(self, tg)))) for tg in self._tags]
@@ -210,15 +267,42 @@ class Lang(tuple):
         return tuple()
 
     @classmethod
-    def _assert_not_deprecated(cls, arg_value):
-        for key in ("id", "name"):
-            try:
-                d = cls._deprecated[key][arg_value]
-            except KeyError:
-                pass
-            else:
-                d[key] = arg_value
-                raise DeprecatedLanguageValue(**d)
+    def _validate_kwargs(cls, **kwargs):
+        lang_tuples = set()
+        for tg, v in kwargs.items():
+            if v:
+                lang_tuples.add(cls._get_language_tuple(tg, v))
+        if len(lang_tuples) == 1:
+            return lang_tuples.pop()
+
+        return tuple()
+
+    @classmethod
+    def _assert_not_deprecated(cls, **kwargs):
+        deprecated = []
+        for kw, arg_value in kwargs.items():
+            if arg_value is None:
+                continue
+            elif kw == "name_or_identifier":
+                keys = ("id", "name")
+            elif kw == "name":
+                keys = ("name",)
+            elif kw in ("pt1", "pt2b", "pt2t", "pt3", "pt5"):
+                keys = ("id",)
+
+            for k in keys:
+                try:
+                    d = cls._deprecated[k][arg_value]
+                except KeyError:
+                    pass
+                else:
+                    d[k] = arg_value
+                    deprecated.append(d)
+
+        if deprecated and deprecated.count(deprecated[0]) == 1:
+            raise DeprecatedLanguageValue(**deprecated[0])
+
+        return True
 
     @classmethod
     def _get_language_tuple(cls, tag, arg_value):

@@ -162,7 +162,7 @@ When an invalid language value is passed to `Lang`, an `InvalidLanguageValue` ex
 ... except InvalidLanguageValue as e:
 ...     e.msg
 ... 
-"'foobar' is not a valid ISO 639 name or identifier."
+"'foobar' is not a valid Lang argument."
 ```
 
 When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue` exception is raised.
