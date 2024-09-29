@@ -46,12 +46,27 @@ class TestLang:
         assert lg1 != lg2
 
     def test_multiple_args(self):
-        with pytest.raises(TypeError):
+        Lang("fra", "French", "fr", "fre", "fra", "fra") == Lang("French")
+
+    def test_wrong_multiple_args(self):
+        with pytest.raises(InvalidLanguageValue):
             Lang("fra", "fr")
 
+    def test_one_kwarg(self):
+        assert Lang(pt1="fr") == Lang("fr")
+
+    def test_one_wrong_kwarg(self):
+        with pytest.raises(InvalidLanguageValue):
+            Lang(name="fr")
+
     def test_mutliple_kwargs(self):
-        with pytest.raises(TypeError):
-            Lang(name_or_identifier="fr", pt3="fra")
+        Lang(
+            name="French", pt1="fr", pt2b="fre", pt2t="fra", pt3="fra"
+        ) == Lang("French")
+
+    def test_mutliple_wrong_kwargs(self):
+        with pytest.raises(InvalidLanguageValue):
+            Lang(name="French", pt1="en")
 
     def test_kwarg_wrong_key(self):
         with pytest.raises(TypeError):
@@ -62,7 +77,7 @@ class TestLang:
             Lang(name_or_identifier="foobar")
 
     def test_no_arg_no_kwarg(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(InvalidLanguageValue):
             Lang()
 
     def test_none_arg(self):
