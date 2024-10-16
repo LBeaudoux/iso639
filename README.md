@@ -177,6 +177,29 @@ When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue
 'Gascon replaced by Occitan (post 1500).'
 ```
 
+## Language Code Validation
+
+The `iso639` library provides a function to check if a language code is valid according to ISO 639 standards.
+
+### `is_valid_language_code(code)`
+
+Checks if a given language code is valid.
+
+**Parameters**:
+
+- `code` (str): The language code to validate.
+
+**Returns**:
+
+- `bool`: `True` if the code is valid, `False` otherwise.
+
+**Example**:
+
+```python
+from iso639 import is_valid_language_code
+
+print(is_valid_language_code('en'))  # Output: True
+print(is_valid_language_code('xyz'))  # Output: False
 
 ## Speed
 
