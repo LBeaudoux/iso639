@@ -1,5 +1,6 @@
 from operator import itemgetter
-from typing import Dict, Iterator, List, Optional, Union
+from typing import Dict, Iterator, List, Optional, Union, Set
+from functools import lru_cache
 
 from .datafile import load_file
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
@@ -359,3 +360,34 @@ def iter_langs() -> Iterator[Lang]:
     sorted_lang_names = load_file("list_langs")
 
     return (Lang(lang_name) for lang_name in sorted_lang_names)
+
+@lru_cache(maxsize=1)
+def _get_valid_codes() -> Set[str]:
+    """Get a set of all valid language codes.
+
+    Returns
+    -------
+    Set[str]
+        A set of valid language codes.
+    """
+    from iso639 import iter_langs  # Import here to avoid circular import
+
+    codes = set()
+    for lang in iter_langs():
+        codes.update(filter(None, [lang.pt1, lang.pt2b, lang.pt2t, lang.pt3, lang.pt5]))
+    return codes
+
+def is_valid_language_code(code: str) -> bool:
+    """Check if a given language code is valid according to ISO 639 data.
+
+    Parameters
+    ----------
+    code : str
+        The language code to validate.
+
+    Returns
+    -------
+    bool
+        True if the code is valid, False otherwise.
+    """
+    return code in _get_valid_codes()
