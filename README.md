@@ -85,27 +85,15 @@ You can use the `asdict` method to return ISO 639 values as a Python dictionary
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
-### In Data Structures
+### Other Language Names
 
-Lists of `Lang` instances are sortable by name. 
+In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
 ```python
->>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
-['English', 'German', 'Russian']
-```
-As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
-```python
->>> {Lang("de"): "foo", Lang("fr"):  "bar"}
-{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
-```
-
-### Iterator
-
-`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
-
-```python
->>> from iso639 import iter_langs
->>> [lg.name for lg in iter_langs()]
-["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
+>>> lg = Lang("ast")
+>>> lg.name
+'Asturian'
+>>> lg.other_names()
+['Asturleonese', 'Bable', 'Leonese']
 ```
 
 ### Language Types
@@ -141,15 +129,28 @@ Conversely, you can also list all the individual languages that share a common m
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 ```
 
-### Other Language Names
+### In Data Structures
 
-In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
+As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
 ```python
->>> lg = Lang("ast")
->>> lg.name
-'Asturian'
->>> lg.other_names()
-['Asturleonese', 'Bable', 'Leonese']
+>>> {Lang("de"): "foo", Lang("fr"):  "bar"}
+{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
+```
+
+Lists of `Lang` instances are sortable by name. 
+```python
+>>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
+['English', 'German', 'Russian']
+```
+
+### Iterator
+
+`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
+
+```python
+>>> from iso639 import iter_langs
+>>> [lg.name for lg in iter_langs()]
+["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
 ```
 
 ### Exceptions
