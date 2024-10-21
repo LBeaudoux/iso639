@@ -181,13 +181,14 @@ When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue
 
 The `iso639` library provides a function to check if a language code is valid according to ISO 639 standards.
 
-### `is_valid_language_code(code)`
+### `is_language(code, identifiers=None)`
 
 Checks if a given language code is valid.
 
 **Parameters**:
 
 - `code` (str): The language code to validate.
+- `identifiers` (tuple, optional): A tuple of ISO 639 identifier types to validate against (e.g., `'pt2b'`, `'pt2t'`).
 
 **Returns**:
 
@@ -196,10 +197,12 @@ Checks if a given language code is valid.
 **Example**:
 
 ```python
-from iso639 import is_valid_language_code
+from iso639 import is_language
 
-print(is_valid_language_code('en'))  # Output: True
-print(is_valid_language_code('xyz'))  # Output: False
+print(is_language('en'))  # Output: True
+print(is_language('xyz'))  # Output: False
+print(is_language('fre', ('pt2b', 'pt2t')))  # Output: True
+```
 
 ## Speed
 
