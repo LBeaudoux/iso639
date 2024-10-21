@@ -1,6 +1,6 @@
 import pytest
 
-from iso639 import Lang, iter_langs, is_valid_language_code
+from iso639 import Lang, iter_langs, is_language
 from iso639.exceptions import InvalidLanguageValue
 
 
@@ -121,16 +121,24 @@ def test_iter_langs():
     assert lg1 == lgs[0]
     assert len(set(lgs)) == len(lgs)
 
-def test_valid_codes():
-    assert is_valid_language_code('en')
-    assert is_valid_language_code('fr')
-    assert is_valid_language_code('de')
 
-def test_invalid_codes():
-    assert not is_valid_language_code('xx')
-    assert not is_valid_language_code('xyz')
-    assert not is_valid_language_code('')
+def test_valid_language():
+    assert is_language('en')
+    assert is_language('fr')
+    assert is_language('de')
+    assert is_language('French')
+
+
+def test_invalid_language():
+    assert not is_language('xx')
+    assert not is_language('xyz')
+    assert not is_language('')
+
+def test_valid_language_with_identifier():
+    assert is_language('fre', ('pt2b', 'pt2t'))
+
+def test_invalid_language_with_identifier():
+    assert not is_language('fr', 'pt3')
 
 def test_none_input():
-    assert not is_valid_language_code(None)
-
+    assert not is_language(None)
