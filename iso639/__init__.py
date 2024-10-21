@@ -1,7 +1,7 @@
-from .iso639 import Lang, iter_langs, is_valid_language_code
+from .iso639 import Lang, iter_langs, is_language
 
 __all__ = [
     "Lang",
     "iter_langs",
-    "is_valid_language_code"
+    "is_language"
 ]
