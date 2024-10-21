@@ -1,5 +1,5 @@
 from operator import itemgetter
-from typing import Dict, Iterator, List, Optional, Union, Set
+from typing import Dict, Iterator, List, Optional, Union, Set, Tuple
 from functools import lru_cache
 
 from .datafile import load_file
@@ -361,33 +361,91 @@ def iter_langs() -> Iterator[Lang]:
 
     return (Lang(lang_name) for lang_name in sorted_lang_names)
 
-@lru_cache(maxsize=1)
-def _get_valid_codes() -> Set[str]:
-    """Get a set of all valid language codes.
+@lru_cache
+def _get_language_values(identifiers_or_names: Tuple[str]) -> Set[str]:
+    tags = set(identifiers_or_names)
+    all_tags = {"pt1", "pt2b", "pt2t", "pt3", "pt5", "name", "other_name"}
+    invalid_tags = tags - all_tags
+    if invalid_tags:
+        raise ValueError(
+            f"Invalid identifiers or names: {', '.join(invalid_tags)}. "
+            f"Valid options are: {', '.join(sorted(all_tags))}."
+        )
+    language_values = set()
+    if "other_name" in tags:
+        mapping = load_file("mapping_ref_name")
+        language_values.update(mapping.keys())
+        tags.remove("other_name")
+    if tags:
+        mapping = load_file("mapping_data")
+        for tag in tags:
+            language_values.update(mapping[tag].keys())
+    return language_values
 
-    Returns
-    -------
-    Set[str]
-        A set of valid language codes.
-    """
-    from iso639 import iter_langs  # Import here to avoid circular import
 
-    codes = set()
-    for lang in iter_langs():
-        codes.update(filter(None, [lang.pt1, lang.pt2b, lang.pt2t, lang.pt3, lang.pt5]))
-    return codes
-
-def is_valid_language_code(code: str) -> bool:
-    """Check if a given language code is valid according to ISO 639 data.
+def is_language(
+    value: str,
+    identifiers_or_names: Union[str, Tuple[str, ...]] = (
+        "pt1",
+        "pt2b",
+        "pt2t",
+        "pt3",
+        "pt5",
+        "name",
+        "other_name",
+    ),
+) -> bool:
+    """Check if a given value corresponds to a valid ISO 639 language
+    identifier or name.
 
     Parameters
     ----------
-    code : str
-        The language code to validate.
+    value : str
+        The language value to validate.
+    identifiers_or_names : Union[str, Tuple[str, ...]], optional
+        The ISO 639 identifiers or names to check against. Defaults to all
+        available identifiers and names.
 
     Returns
     -------
     bool
-        True if the code is valid, False otherwise.
+        True if the value is valid for the given identifiers and names, False
+        otherwise.
+
+    Raises
+    ------
+    TypeError
+        When `identifiers_or_names` is not a tuple or a tuple of strings.
+    ValueError
+        When string(s) of `identifiers_or_names` are not 'pt1', 'pt2b', 'pt2t',
+        'pt3', 'pt5', 'name' or 'other_name'.
+
+    Examples
+    --------
+    >>> is_language("fr")
+    True
+    >>> is_language("French")
+    True
+    >>> is_language("fr", "pt3")
+    False
+    >>> is_language("fre", ("pt2b", "pt2t"))
+    True
     """
-    return code in _get_valid_codes()
+    if isinstance(identifiers_or_names, str):
+        identifiers_or_names = (identifiers_or_names,)
+    elif isinstance(identifiers_or_names, (list, set)) and all(
+        isinstance(s, str) for s in identifiers_or_names
+    ):
+        identifiers_or_names = tuple(identifiers_or_names)
+    elif not isinstance(identifiers_or_names, tuple):
+        raise TypeError(
+            "'identifiers_or_names' must be a string or an iterable of "
+            f"strings, got {type(identifiers_or_names).__name__}."
+        )
+    elif not all(isinstance(s, str) for s in identifiers_or_names):
+        all_types = (type(v).__name__ for v in identifiers_or_names)
+        raise TypeError(
+            "'identifiers_or_names' must be a string or an iterable of "
+            f"strings, got tuple of {' and '.join(all_types)}.",
+        )
+    return value in _get_language_values(identifiers_or_names)
