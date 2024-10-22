@@ -131,20 +131,21 @@ Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 
 ### In Data Structures
 
-Lists of `Lang` instances are sortable by name. 
-```python
->>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
-['English', 'German', 'Russian']
-```
 As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
 ```python
 >>> {Lang("de"): "foo", Lang("fr"):  "bar"}
 {Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
 ```
 
+Lists of `Lang` instances are sortable by name. 
+```python
+>>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
+['English', 'German', 'Russian']
+```
+
 ### Iterator
 
-`iter_langs` iterates through all possible `Lang` instances, ordered alphabetically by name.
+`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
 
 ```python
 >>> from iso639 import iter_langs
