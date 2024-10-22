@@ -85,27 +85,15 @@ You can use the `asdict` method to return ISO 639 values as a Python dictionary
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
-### In Data Structures
+### Other Language Names
 
-Lists of `Lang` instances are sortable by name. 
+In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
 ```python
->>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
-['English', 'German', 'Russian']
-```
-As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
-```python
->>> {Lang("de"): "foo", Lang("fr"):  "bar"}
-{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
-```
-
-### Iterator
-
-`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
-
-```python
->>> from iso639 import iter_langs
->>> [lg.name for lg in iter_langs()]
-["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
+>>> lg = Lang("ast")
+>>> lg.name
+'Asturian'
+>>> lg.other_names()
+['Asturleonese', 'Bable', 'Leonese']
 ```
 
 ### Language Types
@@ -141,15 +129,27 @@ Conversely, you can also list all the individual languages that share a common m
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
 ```
 
-### Other Language Names
+### In Data Structures
 
-In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
+Lists of `Lang` instances are sortable by name. 
 ```python
->>> lg = Lang("ast")
->>> lg.name
-'Asturian'
->>> lg.other_names()
-['Asturleonese', 'Bable', 'Leonese']
+>>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
+['English', 'German', 'Russian']
+```
+As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
+```python
+>>> {Lang("de"): "foo", Lang("fr"):  "bar"}
+{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
+```
+
+### Iterator
+
+`iter_langs` iterates through all possible `Lang` instances, ordered alphabetically by name.
+
+```python
+>>> from iso639 import iter_langs
+>>> [lg.name for lg in iter_langs()]
+["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
 ```
 
 ### Exceptions
@@ -177,36 +177,31 @@ When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue
 'Gascon replaced by Occitan (post 1500).'
 ```
 
-## Language Code Validation
+Note that you can use the `is_language` language checker if you don't want to handle exceptions.
 
-The `iso639` library provides a function to check if a language code is valid according to ISO 639 standards.
+### Checker
 
-### `is_language(code, identifiers=None)`
-
-Checks if a given language code is valid.
-
-**Parameters**:
-
-- `code` (str): The language code to validate.
-- `identifiers` (tuple, optional): A tuple of ISO 639 identifier types to validate against (e.g., `'pt2b'`, `'pt2t'`).
-
-**Returns**:
-
-- `bool`: `True` if the code is valid, `False` otherwise.
-
-**Example**:
+The `is_language` function checks if a language value is valid according to ISO 639.
 
 ```python
-from iso639 import is_language
+>>> from iso639 import is_language
+>>> is_language("fr")
+True
+>>> is_language("French")
+True
+```
 
-print(is_language('en'))  # Output: True
-print(is_language('xyz'))  # Output: False
-print(is_language('fre', ('pt2b', 'pt2t')))  # Output: True
+You can restrict the check to certain identifiers or names by passing an additional argument.
+```python
+>>> is_language("fr", "pt3") # only 639-3
+False
+>>> is_language("fre", ("pt2b", "pt2t")) # only 639-2/B or 639-2/T
+True
 ```
 
 ## Speed
 
-`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than libraries that rely on an embedded database.
+`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than Python libraries that rely on an embedded database.
 
 
 ## Sources
