@@ -178,10 +178,31 @@ When a deprecated language value is passed to `Lang`, a `DeprecatedLanguageValue
 'Gascon replaced by Occitan (post 1500).'
 ```
 
+Note that you can use the `is_language` language checker if you don't want to handle exceptions.
+
+### Checker
+
+The `is_language` function checks if a language value is valid according to ISO 639.
+
+```python
+>>> from iso639 import is_language
+>>> is_language("fr")
+True
+>>> is_language("French")
+True
+```
+
+You can restrict the check to certain identifiers or names by passing an additional argument.
+```python
+>>> is_language("fr", "pt3") # only 639-3
+False
+>>> is_language("fre", ("pt2b", "pt2t")) # only 639-2/B or 639-2/T
+True
+```
 
 ## Speed
 
-`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than libraries that rely on an embedded database.
+`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than Python libraries that rely on an embedded database.
 
 
 ## Sources

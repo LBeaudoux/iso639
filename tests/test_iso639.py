@@ -1,6 +1,6 @@
 import pytest
 
-from iso639 import Lang, iter_langs
+from iso639 import Lang, iter_langs, is_language
 from iso639.exceptions import InvalidLanguageValue
 
 
@@ -120,3 +120,38 @@ def test_iter_langs():
     assert all(isinstance(lg, Lang) for lg in lgs)
     assert lg1 == lgs[0]
     assert len(set(lgs)) == len(lgs)
+
+
+class TestChecker:
+
+    def test_valid_language(self):
+        assert is_language("fr") is True  # 639-1
+        assert is_language("fra") is True  # 639-3 and 639-2/T
+        assert is_language("fre") is True  # 639-2/B
+        assert is_language("ber") is True  # 639-5
+        assert is_language("French") is True  # name
+        assert is_language("Chinese, Mandarin") is True  # other name
+
+    def test_invalid_language(self):
+        assert is_language("xx") is False
+        assert is_language("xyz") is False
+        assert is_language("") is False
+
+    def test_valid_language_with_identifier(self):
+        assert is_language("fr", "pt1") is True
+        assert is_language("fre", ("pt2b", "pt2t")) is True
+        assert is_language("fra", ("pt2b", "pt2t")) is True
+
+    def test_invalid_language_with_identifier(self):
+        assert is_language("fr", "pt3") is False
+
+    def test_none_input(self):
+        assert is_language(None) is False
+
+    def test_wrong_indentifiers_or_names_type(self):
+        with pytest.raises(TypeError):
+            is_language("fr", 42)
+
+    def test_wrong_indentifiers_or_names_value(self):
+        with pytest.raises(ValueError):
+            is_language("fr", "foobar")
