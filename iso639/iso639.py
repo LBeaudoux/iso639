@@ -1,6 +1,6 @@
-from operator import itemgetter
-from typing import Dict, Iterator, List, Optional, Union, Set, Tuple
 from functools import lru_cache
+from operator import itemgetter
+from typing import Dict, Iterator, List, Optional, Set, Tuple, Union
 
 from .datafile import load_file
 from .exceptions import DeprecatedLanguageValue, InvalidLanguageValue
@@ -15,23 +15,50 @@ class Lang(tuple):
 
     ...
 
+    Parameters
+    ----------
+    name_or_identifier : str or Lang, optional
+        ISO 639 identifier or name, by default None.
+    name : str, optional
+        ISO 639 name (or other name), by default None.
+    pt1 : str, optional
+        Two-letter ISO 639-1 identifier, by default None.
+    pt2b : str, optional
+        Three-letter ISO 639-2/B identifier for bibliographic applications, by
+        default None.
+    pt2t : str, optional
+        Three-letter ISO 639-2/T identifier for terminology applications, by
+        default None.
+    pt3 : str, optional
+        Three-letter ISO 639-3 identifier, by default None.
+    pt5 : str, optional
+        Three-letter ISO 639-5 identifier, by default None.
+
+    Raises
+    ------
+    InvalidLanguageValue
+        Raised when the arguments are not valid and compatible.
+    DeprecatedLanguageValue
+        Raised when the arguments point to a deprecated ISO 639 language name
+        or identifier.
+
     Attributes
     ----------
     name : str
         ISO 639-3 reference name for languages, ISO 639-5 English name for
         groups of languages.
     pt1 : str
-        two-letter ISO 639-1 identifier, if there is one.
+        Two-letter ISO 639-1 identifier, if there is one.
     pt2b : str
-        three-letter ISO 639-2/B identifier for bibliographic applications, if
-        there is one
+        Three-letter ISO 639-2/B identifier for bibliographic applications, if
+        there is one.
     pt2t : str
-        three-letter ISO 639-2/T identifier for terminology applications,
-        if there is one
+        Three-letter ISO 639-2/T identifier for terminology applications,
+        if there is one.
     pt3 : str
-        three-letter ISO 639-3 identifier, if there is one
+        Three-letter ISO 639-3 identifier, if there is one.
     pt5 : str
-        three-letter ISO 639-5 identifier, if there is one
+        Three-letter ISO 639-5 identifier, if there is one.
 
     Examples
     --------
@@ -403,7 +430,7 @@ def is_language(
     ----------
     value : str
         The language value to validate.
-    identifiers_or_names : Union[str, Tuple[str, ...]], optional
+    identifiers_or_names : str or tuple of str, optional
         The ISO 639 identifiers or names to check against. Defaults to all
         available identifiers and names.
 
