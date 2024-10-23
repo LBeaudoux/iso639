@@ -260,7 +260,7 @@ class Database:
                             )
                         END AS name,
                         Category_Of_Change AS reason,
-                        SUBSTR(Part1, 1, INSTR(Part1, ' ') - 1) AS change_to,
+                        SUBSTR(Part1, 1, INSTR(Part1, '[') - 1) AS change_to,
                         Notes AS ret_remedy,
                         Date_Added_Or_Changed AS effective
                     FROM ISO_639_2_Changes

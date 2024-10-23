@@ -1,5 +1,6 @@
 ISO 639-1 Code	ISO 639-2 Code	English name of Language	French name of Language	Date Added or Changed	Category of Change	Notes
 	dgr	Tlicho; Dogrib	tlicho; dogrib	2024-04-03	NC	Changed from Dogrib; Dogrib was made the variant name.
+[-bh]	bih	Bihari languages	langues biharis	2021-05-25	Dep	Two-letter identifier bh deprecated in ISO 639-1; use of three-letter identifier bih for Bihari languages is favored.
 	cnr	Montenegrin	monténégrin	2017-12-21	Add	
 	zgh	Standard Moroccan Tamazight	amazighe standard marocain	2012-11-21	Add	
 	hmn	Hmong; Mong	hmong	2010-03-29		
@@ -140,7 +141,7 @@ wa	wln	Walloon	wallon	2002-01-29	Add
 io	ido	Ido	ido	2002-01-15	Add	
 	tup	Tupi languages	tupi, langues	2002-01-11	Add	
 	ast	Asturian; Bable; Leonese; Asturleonese	asturien; bable; léonais; asturoléonais	2001-09-24	Add	
-jv [-jw]	jav	Javanese	javanais	2001-08-13	Dep	jw published in error; withdrawn in favor of jv.
+jv[-jw]	jav	Javanese	javanais	2001-08-13	Dep	jw published in error; withdrawn in favor of jv.
 jv	jav [-jaw]	Javanese	javanais	2001-08-13	CC	jaw based on incorrect code; withdrawn in favor of jav.
 nr	nbl	Ndebele, South; South Ndebele	ndébélé du Sud	2000-08-14	Add	
 nd	nde	Ndebele, North; North Ndebele	ndébélé du Nord	2000-08-14	NC	
@@ -190,13 +191,13 @@ ve	ven	Venda	venda	1999-08-16	Add	This alpha-2 ISO 639-1 code was approved in 19
 kw	cor	Cornish	cornique	1998-08-10	Add	
 gv	glv	Manx	manx; mannois	1998-08-10	Add	
 lb	ltz	Luxembourgish; Letzeburgesch	luxembourgeois	1998-08-10	Add	
-he [-iw]	heb	Hebrew	hébreu	1989-03-11	Dep	Withdrawn
+he[-iw]	heb	Hebrew	hébreu	1989-03-11	Dep	Withdrawn
 he	heb	Hebrew	hébreu	1989-03-11	CC	
 iu	iku	Inuktitut	inuktitut	1989-03-11	Add	
-id [-in]	ind	Indonesian	indonésien	1989-03-11	Dep	Withdrawn
-id [-in]	ind	Indonesian	indonésien	1989-03-11	CC	
+id[-in]	ind	Indonesian	indonésien	1989-03-11	Dep	Withdrawn
+id[-in]	ind	Indonesian	indonésien	1989-03-11	CC	
 ug	uig	Uighur; Uyghur	ouïgour	1989-03-11	Add	
-yi [-ji]	yid	Yiddish	yiddish	1989-03-11	Dep	Withdrawn
+yi[-ji]	yid	Yiddish	yiddish	1989-03-11	Dep	Withdrawn
 yi	yid	Yiddish	yiddish	1989-03-11	CC	
 za	zha	Zhuang; Chuang	zhuang; chuang	1989-03-11	Add	
 	afa	Afro-Asiatic languages	afro-asiatiques, langues			Change from Afro-Asiatic (Other); afro-asiatiques, autres langues
