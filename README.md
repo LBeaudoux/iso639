@@ -207,7 +207,7 @@ True
 
 ## Sources
 
-As of September 25, 2024, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
+As of October 23, 2024, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
  
 | Set                                                                            | Description                                                                                                                  | Registration Authority | Last Modified                                                             |
 |--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------|
