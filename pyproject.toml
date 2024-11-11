@@ -45,4 +45,4 @@ line_length = 79
 packages = ["iso639", "iso639.data"]
 
 [tool.setuptools.package-data]
-iso639 = ["data/*.json"]
+iso639 = ["data/*.json", "py.typed"]

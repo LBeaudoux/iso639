@@ -64,9 +64,10 @@ Pushing changes to your forked repository should trigger a [workflow](https://gi
 flake8
 black --check .
 isort --check-only .
+mypy iso639
 ```
 
-`iso639-lang` uses `flake8` for linting, `black` for formatting and `isort` for sorting imports. The configuration of these tools is available in the `.flake8` and `pyproject.toml` files.
+`iso639-lang` uses `flake8` for linting, `black` for formatting, `isort` for sorting imports and `mypy` for type checking. The configuration of these tools is available in the `.flake8` and `pyproject.toml` files.
 
 
 ## Submitting Changes
