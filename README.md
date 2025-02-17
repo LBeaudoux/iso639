@@ -18,7 +18,7 @@ Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5='')
 ```console
 $ pip install iso639-lang
 ```
-`iso639-lang` supports Python 3.8+.  
+`iso639-lang` supports Python 3.9+.  
   
 ## Usage
 

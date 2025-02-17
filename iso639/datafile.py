@@ -1,12 +1,6 @@
 import json
+from importlib.resources import files
 from typing import Any
-
-try:
-    from importlib.resources import files  # type: ignore[attr-defined, import-not-found]
-except ImportError:
-    # Compatibility for Python <3.9
-    from importlib_resources import files  # type: ignore[no-redef, import-not-found]
-
 
 FILENAMES = {
     "mapping_data": "data/iso-639.json",
