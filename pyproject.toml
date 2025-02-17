@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "iso639-lang"
-version = "2.5.1"
-description = "A fast, simple ISO 639 library."
+version = "2.6.0"
+description = "A simpler, faster ISO 639 library."
 keywords = ["ISO 639", "ISO 639-1", "ISO 639-2", "ISO 639-3", "ISO 639-5", "language code"]
 readme = "README.md"
 authors = [

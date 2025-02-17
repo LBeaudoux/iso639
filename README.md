@@ -85,6 +85,12 @@ You can use the `asdict` method to return ISO 639 values as a Python dictionary
 {'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
 ```
 
+Lists of `Lang` instances are sortable by name. 
+```python
+>>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
+['English', 'German', 'Russian']
+```
+
 ### Other Language Names
 
 In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
@@ -96,7 +102,7 @@ In addition to their reference name, some language identifiers may be associated
 ['Asturleonese', 'Bable', 'Leonese']
 ```
 
-### Language Types
+### Language Type
 
 The type of a language is accessible thanks to the `type` method.
 ```python
@@ -105,7 +111,7 @@ The type of a language is accessible thanks to the `type` method.
 'Historical'
 ```
 
-### Macrolanguages
+### Macrolanguage & Individual Languages
 
 You can easily determine whether a language is a macrolanguage or an individual language.
 ```python
@@ -127,30 +133,6 @@ Conversely, you can also list all the individual languages that share a common m
 >>> lg.individuals()
 [Lang(name='Iranian Persian', pt1='', pt2b='', pt2t='', pt3='pes', pt5=''), 
 Lang(name='Dari', pt1='', pt2b='', pt2t='', pt3='prs', pt5='')]
-```
-
-### In Data Structures
-
-As `Lang` is hashable, `Lang` instances can be added to a set or used as dictionary keys.
-```python
->>> {Lang("de"): "foo", Lang("fr"):  "bar"}
-{Lang(name='German', pt1='de', pt2b='ger', pt2t='deu', pt3='deu', pt5=''): 'foo', Lang(name='French', pt1='fr', pt2b='fre', pt2t='fra', pt3='fra', pt5=''): 'bar'}
-```
-
-Lists of `Lang` instances are sortable by name. 
-```python
->>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
-['English', 'German', 'Russian']
-```
-
-### Iterator
-
-`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
-
-```python
->>> from iso639 import iter_langs
->>> [lg.name for lg in iter_langs()]
-["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
 ```
 
 ### Exceptions
@@ -200,9 +182,20 @@ False
 True
 ```
 
+### Iterator
+
+`iter_langs()` iterates through all possible `Lang` instances, ordered alphabetically by name.
+
+```python
+>>> from iso639 import iter_langs
+>>> [lg.name for lg in iter_langs()]
+["'Are'are", "'Auhelawa", "A'ou", ... , 'ǂHua', 'ǂUngkue', 'ǃXóõ']
+```
+
+
 ## Speed
 
-`iso639-lang` loads its mappings into memory to process calls much [faster](https://github.com/LBeaudoux/benchmark-iso639) than Python libraries that rely on an embedded database.
+`iso639-lang` loads its mappings into memory to process calls much faster than Python libraries that rely on an embedded database.
 
 
 ## Sources
