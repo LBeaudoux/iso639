@@ -200,13 +200,13 @@ True
 
 ## Sources
 
-As of February 17, 2025, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
+As of June 23, 2025, `iso639-lang` is based on the latest tables provided by the ISO 639 registration authorities. Please open a new issue if you find that this library uses out-of-date data files.
  
 | Set                                                                            | Description                                                                                                                  | Registration Authority | Last Modified                                                             |
 |--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|------------------------|---------------------------------------------------------------------------|
 | [Set 1](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | _two-letter language identifiers for major, mostly national individual languages_                                            | Infoterm               | [2009-09-01](https://www.loc.gov/standards/iso639-2/php/code_changes.php) |
 | [Set 2](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt)            | _three-letter language identifiers for a larger number of widely known individual languages and a number of language groups_ | Library of Congress    | [2017-12-21](https://www.loc.gov/standards/iso639-2/php/code_changes.php) |
-| [Set 3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | _three-letter language identifiers covering all individual languages, including living, extinct and ancient languages_       | SIL International      | [2025-01-15](https://iso639-3.sil.org/code_tables/download_tables)        |
+| [Set 3](https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab) | _three-letter language identifiers covering all individual languages, including living, extinct and ancient languages_       | SIL International      | [2025-04-15](https://iso639-3.sil.org/code_tables/download_tables)        |
 | [Set 5](http://id.loc.gov/vocabulary/iso639-5.tsv)                             | _three-letter language identifiers covering a larger set of language groups, living and extinct_                             | Library of Congress    | [2013-02-11](https://www.loc.gov/standards/iso639-5/changes.php)          |
 
 To learn more about how the source tables are processed by the `iso639-lang` library, read the [`generate.py`](https://github.com/LBeaudoux/iso639/blob/master/generate.py) script.
