@@ -79,12 +79,6 @@ Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
 Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
 ```
 
-You can use the `asdict` method to return ISO 639 values as a Python dictionary.
-```python
->>> Lang("fra").asdict()
-{'name': 'French', 'pt1': 'fr', 'pt2b': 'fre', 'pt2t': 'fra', 'pt3': 'fra', 'pt5': ''}
-```
-
 Lists of `Lang` instances are sortable by name. 
 ```python
 >>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
