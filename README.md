@@ -79,12 +79,6 @@ Lang(name='Akan', pt1='ak', pt2b='aka', pt2t='aka', pt3='aka', pt5='')
 Lang(name='Ak', pt1='', pt2b='', pt2t='', pt3='akq', pt5='')
 ```
 
-Lists of `Lang` instances are sortable by name. 
-```python
->>> [lg.name for lg in sorted([Lang("deu"), Lang("rus"), Lang("eng")])]
-['English', 'German', 'Russian']
-```
-
 ### Other Language Names
 
 In addition to their reference name, some language identifiers may be associated with other names. You can list them using the `other_names` method.
