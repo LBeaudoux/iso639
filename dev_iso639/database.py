@@ -80,7 +80,7 @@ class Database:
                 CREATE TABLE ISO_639_3_Names (
                     Id CHAR(3) NOT NULL,
                     Print_Name VARCHAR(75) NOT NULL,
-                    Inverted_Name VARCHAR(75) NOT NULL
+                    Inverted_Name VARCHAR(75)
                 )
                 """
             )

@@ -92,11 +92,12 @@ class TestLang:
         lg = Lang(Id)
         assert lg.pt3 == Id
         assert lg == Lang(Print_Name)
-        assert lg == Lang(Inverted_Name)
+        assert not Inverted_Name or lg == Lang(Inverted_Name)
 
         assert lg.name == Print_Name or lg.other_names().count(Print_Name) == 1
         assert (
-            lg.name == Inverted_Name
+            not Inverted_Name
+            or lg.name == Inverted_Name
             or lg.other_names().count(Inverted_Name) == 1
         )
         assert lg.other_names() == sorted(lg.other_names())
