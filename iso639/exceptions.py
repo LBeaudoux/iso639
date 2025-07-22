@@ -49,7 +49,10 @@ class DeprecatedLanguageValue(Exception):
             "NC": "name change",
             "NA": "variant name(s) added",
         }
-        reason = reasons.get(kwargs.get("reason"))
+        if reason_code := kwargs.get("reason"):
+            reason = reasons.get(reason_code, "unknown reason")
+        else:
+            reason = "unknown reason"
         if kwargs.get("change_to"):
             remedy = "Use [{change_to}] instead.".format(**kwargs)
         elif kwargs.get("ret_remedy"):
@@ -64,15 +67,11 @@ class DeprecatedLanguageValue(Exception):
         )
 
         self.msg = pt.format(reason, remedy, **kwargs)
-        for attr_name in (
-            "id",
-            "name",
-            "reason",
-            "change_to",
-            "ret_remedy",
-            "effective",
-        ):
-            attr_value = kwargs.get(attr_name, "")
-            setattr(self, attr_name, attr_value)
+        self.id = kwargs.get("id", "")
+        self.name = kwargs.get("name", "")
+        self.reason = kwargs.get("reason", "")
+        self.change_to = kwargs.get("change_to", "")
+        self.ret_remedy = kwargs.get("ret_remedy", "")
+        self.effective = kwargs.get("effective", "")
 
         super().__init__(self.msg)

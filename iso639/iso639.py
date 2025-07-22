@@ -320,6 +320,8 @@ class Lang(tuple):
                 keys = ("name",)
             elif kw in ("pt1", "pt2b", "pt2t", "pt3", "pt5"):
                 keys = ("id",)
+            else:
+                keys = ()
 
             for k in keys:
                 try:
