@@ -168,10 +168,13 @@ class Lang(tuple):
     def __eq__(self, other):
         return type(other) is type(self) and hash(other) == hash(self)
 
-    def __lt__(self, other):
-        return (
-            type(other) is type(self) and other.name and self.name < other.name
-        )
+    def __lt__(self, other) -> bool:
+        for i in range(min(len(self), len(other))):
+            if self[i] < other[i]:
+                return True
+            elif self[i] > other[i]:
+                return False
+        return len(self) < len(other)
 
     def __getnewargs__(self):
         unpickling_args = (self.name,)
