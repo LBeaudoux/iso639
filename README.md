@@ -3,7 +3,7 @@
 
 ![PyPI](https://img.shields.io/pypi/v/iso639-lang)
 ![Supported Python versions](https://img.shields.io/pypi/pyversions/iso639-lang.svg)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/iso639-lang)
+[![PyPI Downloads](https://static.pepy.tech/badge/iso639-lang/month)](https://pepy.tech/projects/iso639-lang)
   
 `iso639-lang` handles the ISO 639 code for individual languages and language groups.
 
